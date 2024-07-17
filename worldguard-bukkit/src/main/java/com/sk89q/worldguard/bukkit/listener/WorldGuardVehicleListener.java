@@ -64,7 +64,7 @@ public class WorldGuardVehicleListener extends AbstractListener {
                     LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
                     Location lastValid;
                     if ((lastValid = WorldGuard.getInstance().getPlatform().getSessionManager().get(localPlayer)
-                            .testMoveTo(localPlayer, BukkitAdapter.adapt(event.getTo()), MoveType.RIDE)) != null) {
+                            .testMoveToSync(localPlayer, BukkitAdapter.adapt(event.getTo()), MoveType.RIDE)) != null) {
                         vehicle.setVelocity(new Vector(0, 0, 0));
                         vehicle.teleport(event.getFrom());
                         if (Locations.isDifferentBlock(lastValid, BukkitAdapter.adapt(event.getFrom()))) {

@@ -37,6 +37,7 @@ import com.sk89q.worldguard.util.Locations;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -183,16 +184,25 @@ public class Session {
 
     /**
      * Test movement to the given location.
-     *
-     * @param player The player
-     * @param to The new location
-     * @param moveType The type of move
-     * @return The overridden location, if the location is being overridden
-     * @see #testMoveTo(LocalPlayer, Location, MoveType, boolean) For an explanation
      */
     @Nullable
-    public Location testMoveTo(LocalPlayer player, Location to, MoveType moveType) {
-        return testMoveTo(player, to, moveType, false);
+    public CompletableFuture<Location> testMoveToAsync(LocalPlayer player, Location to, MoveType moveType) {
+        return testMoveToAsync(player, to, moveType, false);
+    }
+
+    @Nullable
+    public CompletableFuture<Location> testMoveToAsync(LocalPlayer player, Location to, MoveType moveType, boolean forcedStart) {
+        return CompletableFuture.supplyAsync(() -> testMoveToCore(player, to, moveType, forcedStart));
+    }
+
+    @Nullable
+    public Location testMoveToSync(LocalPlayer player, Location to, MoveType moveType) {
+        return testMoveToSync(player, to, moveType, false);
+    }
+
+    @Nullable
+    public Location testMoveToSync(LocalPlayer player, Location to, MoveType moveType, boolean forcedStart) {
+        return testMoveToCore(player, to, moveType, forcedStart);
     }
 
     /**
@@ -208,37 +218,50 @@ public class Session {
      * @param player The player
      * @param to The new location
      * @param moveType The type of move
-     * @param forced Whether to force a check
+     * @param forcedStart Whether to force a check
      * @return The overridden location, if the location is being overridden
      */
     @Nullable
-    public Location testMoveTo(LocalPlayer player, Location to, MoveType moveType, boolean forced) {
-        RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
+    private Location testMoveToCore(LocalPlayer player, Location to, MoveType moveType, boolean forcedStart) {
+        boolean forced = forcedStart;
+
+        final RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
 
         if (!forced && needRefresh.getAndSet(false)) {
             forced = true;
         }
 
         if (forced || Locations.isDifferentBlock(lastValid, to)) {
-            ApplicableRegionSet toSet = query.getApplicableRegions(to);
+            final ApplicableRegionSet toSet = query.getApplicableRegions(to);
 
-            for (Handler handler : handlers.values()) {
+            final Set<ProtectedRegion> toRegions = toSet.getRegions();
+            boolean anyHandlerDisallowed = false;
+
+            for (final Handler handler : handlers.values()) {
                 if (!handler.testMoveTo(player, lastValid, to, toSet, moveType) && moveType.isCancellable()) {
-                    return lastValid;
+                    anyHandlerDisallowed = true;
+                    break;
                 }
             }
 
-            Set<ProtectedRegion> entered = Sets.difference(toSet.getRegions(), lastRegionSet);
-            Set<ProtectedRegion> exited = Sets.difference(lastRegionSet, toSet.getRegions());
+            if (!anyHandlerDisallowed) {
+                final Set<ProtectedRegion> entered = Sets.difference(toRegions, lastRegionSet);
+                final Set<ProtectedRegion> exited = Sets.difference(lastRegionSet, toRegions);
 
-            for (Handler handler : handlers.values()) {
-                if (!handler.onCrossBoundary(player, lastValid, to, toSet, entered, exited, moveType) && moveType.isCancellable()) {
-                    return lastValid;
+                for (Handler handler : handlers.values()) {
+                    if (!handler.onCrossBoundary(player, lastValid, to, toSet, entered, exited, moveType) && moveType.isCancellable()) {
+                        anyHandlerDisallowed = true;
+                        break;
+                    }
                 }
             }
 
-            lastValid = to;
-            lastRegionSet = toSet.getRegions();
+            if (!anyHandlerDisallowed) {
+                lastValid = to;
+                lastRegionSet = toRegions;
+            } else {
+                return lastValid;
+            }
         }
 
         return null;

@@ -401,7 +401,7 @@ public class WorldGuardPlayerListener extends AbstractListener {
                 }
             }
             if (null != WorldGuard.getInstance().getPlatform().getSessionManager().get(localPlayer)
-                    .testMoveTo(localPlayer, BukkitAdapter.adapt(event.getTo()), MoveType.TELEPORT)) {
+                    .testMoveToSync(localPlayer, BukkitAdapter.adapt(event.getTo()), MoveType.TELEPORT)) {
                 event.setCancelled(true);
                 return;
             }

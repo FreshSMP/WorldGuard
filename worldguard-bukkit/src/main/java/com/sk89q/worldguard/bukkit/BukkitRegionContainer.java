@@ -40,6 +40,8 @@ import org.bukkit.event.world.WorldUnloadEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.annotation.Nullable;
 
@@ -51,6 +53,8 @@ public class BukkitRegionContainer extends RegionContainer {
     private static final int CACHE_INVALIDATION_INTERVAL = 2;
 
     private final WorldGuardPlugin plugin;
+
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     /**
      * Create a new instance.
@@ -77,20 +81,24 @@ public class BukkitRegionContainer extends RegionContainer {
 
             @EventHandler
             public void onChunkLoad(ChunkLoadEvent event) {
-                RegionManager manager = get(BukkitAdapter.adapt(event.getWorld()));
-                if (manager != null) {
-                    Chunk chunk = event.getChunk();
-                    manager.loadChunk(BlockVector2.at(chunk.getX(), chunk.getZ()));
-                }
+                executor.submit(() -> {
+                    final RegionManager manager = get(BukkitAdapter.adapt(event.getWorld()));
+                    if (manager != null) {
+                        Chunk chunk = event.getChunk();
+                        manager.loadChunk(BlockVector2.at(chunk.getX(), chunk.getZ()));
+                    }
+                });
             }
 
             @EventHandler
             public void onChunkUnload(ChunkUnloadEvent event) {
-                RegionManager manager = get(BukkitAdapter.adapt(event.getWorld()));
-                if (manager != null) {
-                    Chunk chunk = event.getChunk();
-                    manager.unloadChunk(BlockVector2.at(chunk.getX(), chunk.getZ()));
-                }
+                executor.submit(() -> {
+                    final RegionManager manager = get(BukkitAdapter.adapt(event.getWorld()));
+                    if (manager != null) {
+                        Chunk chunk = event.getChunk();
+                        manager.unloadChunk(BlockVector2.at(chunk.getX(), chunk.getZ()));
+                    }
+                });
             }
         }, plugin);
 

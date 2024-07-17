@@ -65,7 +65,7 @@ public class PlayerMoveListener extends AbstractListener {
         LocalPlayer player = getPlugin().wrapPlayer(event.getPlayer());
 
         Session session = WorldGuard.getInstance().getPlatform().getSessionManager().get(player);
-        session.testMoveTo(player, BukkitAdapter.adapt(event.getRespawnLocation()), MoveType.RESPAWN, true);
+        session.testMoveToAsync(player, BukkitAdapter.adapt(event.getRespawnLocation()), MoveType.RESPAWN, true);
     }
 
     @EventHandler
@@ -74,7 +74,7 @@ public class PlayerMoveListener extends AbstractListener {
         if (entity instanceof Player) {
             LocalPlayer player = getPlugin().wrapPlayer((Player) entity);
             Session session = WorldGuard.getInstance().getPlatform().getSessionManager().get(player);
-            if (null != session.testMoveTo(player, BukkitAdapter.adapt(event.getVehicle().getLocation()), MoveType.EMBARK, true)) {
+            if (null != session.testMoveToAsync(player, BukkitAdapter.adapt(event.getVehicle().getLocation()), MoveType.EMBARK, true)) {
                 event.setCancelled(true);
             }
         }
@@ -102,39 +102,47 @@ public class PlayerMoveListener extends AbstractListener {
         } else if (event.getPlayer().getVehicle() != null && event.getPlayer().getVehicle() instanceof AbstractHorse) {
             moveType = MoveType.RIDE;
         }
-        com.sk89q.worldedit.util.Location weLocation = session.testMoveTo(localPlayer, BukkitAdapter.adapt(to), moveType);
 
-        if (weLocation != null) {
-            final Location override = BukkitAdapter.adapt(weLocation);
-            override.setX(override.getBlockX() + 0.5);
-            override.setY(override.getBlockY());
-            override.setZ(override.getBlockZ() + 0.5);
-            override.setPitch(to.getPitch());
-            override.setYaw(to.getYaw());
-
-            event.setTo(override.clone());
-
-            Entity vehicle = player.getVehicle();
-            if (vehicle != null) {
-                vehicle.eject();
-
-                Entity current = vehicle;
-                while (current != null) {
-                    current.eject();
-                    vehicle.setVelocity(new Vector());
-                    if (vehicle instanceof LivingEntity) {
-                        vehicle.teleport(override.clone());
-                    } else {
-                        vehicle.teleport(override.clone().add(0, 1, 0));
-                    }
-                    current = current.getVehicle();
-                }
-
-                player.teleport(override.clone().add(0, 1, 0));
-
-                Bukkit.getScheduler().runTaskLater(getPlugin(), () -> player.teleport(override.clone().add(0, 1, 0)), 1);
+        session.testMoveToAsync(localPlayer, BukkitAdapter.adapt(to), moveType).whenComplete((weLocation, throwable) -> {
+            if (throwable != null) {
+                throwable.printStackTrace();
+                return;
             }
-        }
+
+            if (weLocation != null) {
+                final Location override = BukkitAdapter.adapt(weLocation);
+                override.setX(override.getBlockX() + 0.5);
+                override.setY(override.getBlockY());
+                override.setZ(override.getBlockZ() + 0.5);
+                override.setPitch(to.getPitch());
+                override.setYaw(to.getYaw());
+
+                Bukkit.getScheduler().runTask(getPlugin(), () -> {
+                    event.setTo(override.clone());
+
+                    Entity vehicle = player.getVehicle();
+                    if (vehicle != null) {
+                        vehicle.eject();
+
+                        Entity current = vehicle;
+                        while (current != null) {
+                            current.eject();
+                            vehicle.setVelocity(new Vector());
+                            if (vehicle instanceof LivingEntity) {
+                                vehicle.teleport(override.clone());
+                            } else {
+                                vehicle.teleport(override.clone().add(0, 1, 0));
+                            }
+                            current = current.getVehicle();
+                        }
+
+                        player.teleport(override.clone().add(0, 1, 0));
+
+                        Bukkit.getScheduler().runTaskLater(getPlugin(), () -> player.teleport(override.clone().add(0, 1, 0)), 1);
+                    }
+                });
+            }
+        });
     }
 
     @EventHandler
@@ -143,13 +151,21 @@ public class PlayerMoveListener extends AbstractListener {
         LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
 
         Session session = WorldGuard.getInstance().getPlatform().getSessionManager().get(localPlayer);
-        com.sk89q.worldedit.util.Location loc = session.testMoveTo(localPlayer,
-            BukkitAdapter.adapt(event.getPlayer().getLocation()), MoveType.OTHER_CANCELLABLE); // white lie
-        if (loc != null) {
-            player.teleport(BukkitAdapter.adapt(loc));
-        }
 
-        session.uninitialize(localPlayer);
+        session.testMoveToAsync(localPlayer, BukkitAdapter.adapt(event.getPlayer().getLocation()), MoveType.OTHER_CANCELLABLE)
+                .whenComplete((weLocation, throwable) -> {
+                    if (throwable != null) {
+                        throwable.printStackTrace();
+                        return;
+                    }
+
+                    if (weLocation != null) {
+                        Location loc = BukkitAdapter.adapt(weLocation);
+                        player.teleportAsync(loc);
+                    }
+
+                    session.uninitialize(localPlayer);
+                });
     }
 
     private class EntityMountListener implements Listener {
@@ -159,7 +175,7 @@ public class PlayerMoveListener extends AbstractListener {
             if (entity instanceof Player) {
                 LocalPlayer player = getPlugin().wrapPlayer((Player) entity);
                 Session session = WorldGuard.getInstance().getPlatform().getSessionManager().get(player);
-                if (null != session.testMoveTo(player, BukkitAdapter.adapt(event.getMount().getLocation()), MoveType.EMBARK, true)) {
+                if (null != session.testMoveToAsync(player, BukkitAdapter.adapt(event.getMount().getLocation()), MoveType.EMBARK, true)) {
                     event.setCancelled(true);
                 }
             }
