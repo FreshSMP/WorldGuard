@@ -27,6 +27,8 @@ import com.sk89q.util.yaml.YAMLProcessor;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.domains.CustomDomain;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.flags.FlagUtil;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
@@ -214,14 +216,14 @@ public class YamlRegionFile implements RegionDatabase {
             } else if (region instanceof ProtectedPolygonalRegion) {
                 ProtectedPolygonalRegion poly = (ProtectedPolygonalRegion) region;
                 node.setProperty("type", "poly2d");
-                node.setProperty("min-y", poly.getMinimumPoint().getBlockY());
-                node.setProperty("max-y", poly.getMaximumPoint().getBlockY());
+                node.setProperty("min-y", poly.getMinimumPoint().y());
+                node.setProperty("max-y", poly.getMaximumPoint().y());
 
                 List<Map<String, Object>> points = new ArrayList<>();
                 for (BlockVector2 point : poly.getPoints()) {
                     Map<String, Object> data = new HashMap<>();
-                    data.put("x", point.getBlockX());
-                    data.put("z", point.getBlockZ());
+                    data.put("x", point.x());
+                    data.put("z", point.z());
                     points.add(data);
                 }
 
@@ -285,6 +287,12 @@ public class YamlRegionFile implements RegionDatabase {
             }
         }
 
+        YAMLNode apiDomains = node.getNode("custom");
+        if (apiDomains != null) {
+            Map<String, CustomDomain> parsedDomains = WorldGuard.getInstance().getDomainRegistry().unmarshal(apiDomains.getMap(), true);
+            domain.setCustomDomains(parsedDomains);
+        }
+
         return domain;
     }
 
@@ -304,6 +312,14 @@ public class YamlRegionFile implements RegionDatabase {
         setDomainData(domainData, "players", domain.getPlayers());
         setDomainData(domainData, "unique-ids", domain.getUniqueIds());
         setDomainData(domainData, "groups", domain.getGroups());
+
+        if (!domain.getCustomDomains().isEmpty()) {
+            Map<String, Object> values = new HashMap<>();
+            for (CustomDomain customDomain : domain.getCustomDomains()) {
+                values.put(customDomain.getName(), customDomain.marshal());
+            }
+            domainData.put("custom", values);
+        }
 
         return domainData;
     }
