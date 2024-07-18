@@ -38,7 +38,7 @@ public class VectorFlag extends Flag<Vector3> {
     }
 
     @Override
-    public Vector3 parseInput(FlagContext context) throws InvalidFlagFormat {
+    public Vector3 parseInput(FlagContext context) throws InvalidFlagFormatException {
         String input = context.getUserInput();
 
         if ("here".equalsIgnoreCase(input)) {
@@ -56,7 +56,7 @@ public class VectorFlag extends Flag<Vector3> {
                 }
             }
 
-            throw new InvalidFlagFormat("Expected 'here' or x,y,z.");
+            throw new InvalidFlagFormatException("Expected 'here' or x,y,z.");
         }
     }
 
@@ -82,9 +82,9 @@ public class VectorFlag extends Flag<Vector3> {
     @Override
     public Object marshal(Vector3 o) {
         Map<String, Object> vec = new HashMap<>();
-        vec.put("x", o.getX());
-        vec.put("y", o.getY());
-        vec.put("z", o.getZ());
+        vec.put("x", o.x());
+        vec.put("y", o.y());
+        vec.put("z", o.z());
         return vec;
     }
 
