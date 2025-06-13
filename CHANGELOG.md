@@ -1,5 +1,13 @@
 # Changelog
 
+## 7.0.14
+
+* Update to 1.21.5
+* Fix hopper minecarts not being able to take items from containers in protected regions.
+* Fix hopper minecarts not being able to take items from other hopper minecarts in protected regions.
+* Fix non-members being able to leash boats in protected regions.
+* Use new knockback event on Paper servers to better handle mace knockback in pvp and some other knockback situations.
+
 ## 7.0.13
 
 * Update to 1.21.4
