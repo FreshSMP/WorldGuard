@@ -68,6 +68,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
@@ -113,27 +114,26 @@ public class WorldGuardPlayerListener extends AbstractListener {
         WorldConfiguration wcfg = getWorldConfig(world);
 
         if (cfg.activityHaltToggle) {
-            player.sendMessage(ChatColor.YELLOW
-                    + "Intensive server activity has been HALTED.");
+            player.sendMessage(ChatColor.YELLOW + "Intensive server activity has been HALTED.");
 
-            int removed = 0;
+            AtomicInteger removed = new AtomicInteger();
 
             for (Entity entity : world.getEntities()) {
-                if (Entities.isIntensiveEntity(BukkitAdapter.adapt(entity))) {
-                    entity.remove();
-                    removed++;
-                }
+                getPlugin().getServer().getRegionScheduler().execute(getPlugin(), entity.getLocation(), () -> {
+                    if (Entities.isIntensiveEntity(BukkitAdapter.adapt(entity))) {
+                        entity.remove();
+                        removed.incrementAndGet();
+                    }
+                });
             }
 
-            if (removed > 10) {
-                log.info("Halt-Act: " + removed + " entities (>10) auto-removed from "
-                        + player.getWorld());
+            if (removed.get() > 10) {
+                log.info("Halt-Act: " + removed.get() + " entities (>10) auto-removed from " + player.getWorld());
             }
         }
 
         if (wcfg.fireSpreadDisableToggle) {
-            player.sendMessage(ChatColor.YELLOW
-                    + "Fire spread is currently globally disabled for this world.");
+            player.sendMessage(ChatColor.YELLOW + "Fire spread is currently globally disabled for this world.");
         }
 
         Events.fire(new ProcessPlayerEvent(player));
