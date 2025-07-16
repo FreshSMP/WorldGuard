@@ -268,7 +268,7 @@ public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
     public ProtectedRegion getSpawnProtection(World world) {
         if (world instanceof BukkitWorld) {
             org.bukkit.World bWorld = ((BukkitWorld) world).getWorld();
-            if (bWorld.getUID().equals(Bukkit.getServer().getWorlds().get(0).getUID())) {
+            if (bWorld.getUID().equals(Bukkit.getServer().getWorlds().getFirst().getUID())) {
                 int radius = Bukkit.getServer().getSpawnRadius();
                 if (radius > 0) {
                     BlockVector3 spawnLoc = BukkitAdapter.asBlockVector(bWorld.getSpawnLocation());

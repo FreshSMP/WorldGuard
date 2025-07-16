@@ -20,7 +20,6 @@
 package com.sk89q.worldguard.bukkit.listener;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.config.WorldConfiguration;
@@ -28,10 +27,10 @@ import com.sk89q.worldguard.util.Entities;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 public class WorldGuardWorldListener extends AbstractListener {
@@ -47,17 +46,19 @@ public class WorldGuardWorldListener extends AbstractListener {
         ConfigurationManager cfg = getConfig();
 
         if (cfg.activityHaltToggle) {
-            int removed = 0;
+            AtomicInteger removed = new AtomicInteger();
 
             for (Entity entity : event.getChunk().getEntities()) {
-                if (Entities.isIntensiveEntity(BukkitAdapter.adapt(entity))) {
-                    entity.remove();
-                    removed++;
-                }
+                getPlugin().getServer().getRegionScheduler().execute(getPlugin(), entity.getLocation(), () -> {
+                    if (Entities.isIntensiveEntity(BukkitAdapter.adapt(entity))) {
+                        entity.remove();
+                        removed.incrementAndGet();
+                    }
+                });
             }
 
-            if (removed > 50) {
-                log.info("Halt-Act: " + removed + " entities (>50) auto-removed from " + event.getChunk().toString());
+            if (removed.get() > 50) {
+                log.info("Halt-Act: " + removed + " entities (>50) auto-removed from " + event.getChunk());
             }
         }
     }
@@ -77,15 +78,18 @@ public class WorldGuardWorldListener extends AbstractListener {
      */
     public void initWorld(World world) {
         WorldConfiguration wcfg = getWorldConfig(world);
-        if (wcfg.alwaysRaining && !wcfg.disableWeather) {
-            world.setStorm(true);
-        } else if (wcfg.disableWeather && !wcfg.alwaysRaining) {
-            world.setStorm(false);
-        }
-        if (wcfg.alwaysThundering && !wcfg.disableThunder) {
-            world.setThundering(true);
-        } else if (wcfg.disableThunder && !wcfg.alwaysThundering) {
-            world.setStorm(false);
-        }
+        getPlugin().getServer().getGlobalRegionScheduler().execute(getPlugin(), () -> {
+            if (wcfg.alwaysRaining && !wcfg.disableWeather) {
+                world.setStorm(true);
+            } else if (wcfg.disableWeather && !wcfg.alwaysRaining) {
+                world.setStorm(false);
+            }
+
+            if (wcfg.alwaysThundering && !wcfg.disableThunder) {
+                world.setThundering(true);
+            } else if (wcfg.disableThunder && !wcfg.alwaysThundering) {
+                world.setStorm(false);
+            }
+        });
     }
 }
