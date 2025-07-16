@@ -266,8 +266,8 @@ public class WorldGuardPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        WorldGuard.getInstance().disable();
         this.cancelTasks();
+        WorldGuard.getInstance().disable();
     }
 
     @Override
@@ -537,5 +537,4 @@ public class WorldGuardPlugin extends JavaPlugin {
         this.getServer().getAsyncScheduler().cancelTasks(this);
         this.getServer().getGlobalRegionScheduler().cancelTasks(this);
     }
-
 }

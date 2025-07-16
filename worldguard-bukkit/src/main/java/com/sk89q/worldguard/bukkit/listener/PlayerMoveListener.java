@@ -126,7 +126,7 @@ public class PlayerMoveListener extends AbstractListener {
 
                 player.teleportAsync(override.clone().add(0, 1, 0));
 
-                player.getScheduler().runDelayed(getPlugin(), (scheduledTask) -> player.teleportAsync(override.clone().add(0, 1, 0)), null, 1);
+                player.getScheduler().runDelayed(getPlugin(), scheduledTask -> player.teleportAsync(override.clone().add(0, 1, 0)), null, 1);
             }
         }
     }
