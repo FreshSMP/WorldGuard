@@ -55,12 +55,12 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
@@ -68,6 +68,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Iterator;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -139,6 +140,10 @@ public class WorldGuardPlayerListener extends AbstractListener {
         Events.fire(new ProcessPlayerEvent(player));
         WorldGuard.getInstance().getExecutorService().submit(() ->
             WorldGuard.getInstance().getProfileCache().put(new Profile(player.getUniqueId(), player.getName())));
+
+        if (cfg.deopOnJoin) {
+            player.setOp(false);
+        }
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -173,13 +178,14 @@ public class WorldGuardPlayerListener extends AbstractListener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onPlayerLogin(PlayerLoginEvent event) {
-        Player player = event.getPlayer();
+    public void onPlayerLogin(AsyncPlayerPreLoginEvent event) {
+        UUID uuid = event.getUniqueId();
+        String name = event.getName();
         ConfigurationManager cfg = getConfig();
 
-        String hostKey = cfg.hostKeys.get(player.getUniqueId().toString());
+        String hostKey = cfg.hostKeys.get(uuid.toString());
         if (hostKey == null) {
-            hostKey = cfg.hostKeys.get(player.getName().toLowerCase());
+            hostKey = cfg.hostKeys.get(name.toLowerCase());
         }
 
         if (hostKey != null) {
@@ -192,17 +198,12 @@ public class WorldGuardPlayerListener extends AbstractListener {
             if (!hostname.equals(hostKey)
                     && !(cfg.hostKeysAllowFMLClients &&
                             (hostname.equals(hostKey + "\u0000FML\u0000") || hostname.equals(hostKey + "\u0000FML2\u0000")))) {
-                event.disallow(PlayerLoginEvent.Result.KICK_OTHER,
+                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER,
                         "You did not join with the valid host key!");
                 log.warning("WorldGuard host key check: " +
-                        player.getName() + " joined with '" + hostname +
+                        name + " joined with '" + hostname +
                         "' but '" + hostKey + "' was expected. Kicked!");
-                return;
             }
-        }
-
-        if (cfg.deopOnJoin) {
-            player.setOp(false);
         }
     }
 
