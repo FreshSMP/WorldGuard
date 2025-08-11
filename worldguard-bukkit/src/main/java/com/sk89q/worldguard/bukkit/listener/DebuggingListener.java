@@ -60,6 +60,7 @@ public class DebuggingListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlaceBlock(PlaceBlockEvent event) {
+        if(getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
         StringBuilder builder = new StringBuilder();
         builder.append("PLACE");
         builder.append(" ");
@@ -78,6 +79,7 @@ public class DebuggingListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onBreakBlock(BreakBlockEvent event) {
+        if(getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
         StringBuilder builder = new StringBuilder();
         builder.append("DIG");
         builder.append(" ");
@@ -96,6 +98,7 @@ public class DebuggingListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onUseBlock(UseBlockEvent event) {
+        if(getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
         StringBuilder builder = new StringBuilder();
         builder.append("INTERACT");
         builder.append(" ");
@@ -107,6 +110,7 @@ public class DebuggingListener extends AbstractListener {
         builder.append(" ");
         builder.append(": ").append(getEventName(event.getOriginalEvent()));
         if (event.getOriginalEvent() instanceof PlayerInteractEvent) {
+        if(getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
             builder.append(".").append(((PlayerInteractEvent) event.getOriginalEvent()).getAction());
         }
         if (event.getResult() != Result.DEFAULT) {
@@ -117,6 +121,7 @@ public class DebuggingListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onSpawnEntity(SpawnEntityEvent event) {
+        if(getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
         StringBuilder builder = new StringBuilder();
         builder.append("SPAWN");
         builder.append(" ");
@@ -135,6 +140,7 @@ public class DebuggingListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onDestroyEntity(DestroyEntityEvent event) {
+        if(getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
         StringBuilder builder = new StringBuilder();
         builder.append("DESTROY");
         builder.append(" ");
@@ -153,6 +159,7 @@ public class DebuggingListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onUseEntity(UseEntityEvent event) {
+        if(getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
         StringBuilder builder = new StringBuilder();
         builder.append("INTERACT");
         builder.append(" ");
@@ -171,6 +178,7 @@ public class DebuggingListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onDamageEntity(DamageEntityEvent event) {
+        if(getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
         StringBuilder builder = new StringBuilder();
         builder.append("DAMAGE");
         builder.append(" ");
@@ -189,6 +197,7 @@ public class DebuggingListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onUseItem(UseItemEvent event) {
+        if(getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
         StringBuilder builder = new StringBuilder();
         builder.append("USE");
         builder.append(" ");
