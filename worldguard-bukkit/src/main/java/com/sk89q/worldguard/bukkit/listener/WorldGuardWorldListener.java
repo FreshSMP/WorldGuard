@@ -20,7 +20,6 @@
 package com.sk89q.worldguard.bukkit.listener;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.config.ConfigurationManager;
 import com.sk89q.worldguard.config.WorldConfiguration;
@@ -28,7 +27,6 @@ import com.sk89q.worldguard.util.Entities;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 
@@ -44,7 +42,7 @@ public class WorldGuardWorldListener extends AbstractListener {
 
     @EventHandler
     public void onChunkLoad(ChunkLoadEvent event) {
-        if(getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
         ConfigurationManager cfg = getConfig();
 
         if (cfg.activityHaltToggle) {
@@ -65,7 +63,7 @@ public class WorldGuardWorldListener extends AbstractListener {
 
     @EventHandler
     public void onWorldLoad(WorldLoadEvent event) {
-        if(getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
         initWorld(event.getWorld());
     }
 

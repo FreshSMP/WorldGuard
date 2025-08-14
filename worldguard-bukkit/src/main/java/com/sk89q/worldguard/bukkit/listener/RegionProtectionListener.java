@@ -155,7 +155,7 @@ public class RegionProtectionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlaceBlock(final PlaceBlockEvent event) {
-        if(getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
         if (event.getResult() == Result.ALLOW) return; // Don't care about events that have been pre-allowed
         if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
         if (isWhitelisted(event.getCause(), event.getWorld(), false)) return; // Whitelisted cause
@@ -209,7 +209,7 @@ public class RegionProtectionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBreakBlock(final BreakBlockEvent event) {
-        if(getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
         if (event.getResult() == Result.ALLOW) return; // Don't care about events that have been pre-allowed
         if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
         if (isWhitelisted(event.getCause(), event.getWorld(), false)) return; // Whitelisted cause
@@ -246,7 +246,7 @@ public class RegionProtectionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onUseBlock(final UseBlockEvent event) {
-        if(getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
         if (event.getResult() == Result.ALLOW) return; // Don't care about events that have been pre-allowed
         if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
         if (isWhitelisted(event.getCause(), event.getWorld(), false)) return; // Whitelisted cause
@@ -316,7 +316,7 @@ public class RegionProtectionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onSpawnEntity(SpawnEntityEvent event) {
-        if(getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
         if (event.getResult() == Result.ALLOW) return; // Don't care about events that have been pre-allowed
         if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
         if (isWhitelisted(event.getCause(), event.getWorld(), false)) return; // Whitelisted cause
@@ -363,7 +363,7 @@ public class RegionProtectionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onDestroyEntity(DestroyEntityEvent event) {
-        if(getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
         if (event.getResult() == Result.ALLOW) return; // Don't care about events that have been pre-allowed
         if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
         if (isWhitelisted(event.getCause(), event.getWorld(), false)) return; // Whitelisted cause
@@ -400,7 +400,7 @@ public class RegionProtectionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onUseEntity(UseEntityEvent event) {
-        if(getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
         if (event.getResult() == Result.ALLOW) return; // Don't care about events that have been pre-allowed
         if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
         if (isWhitelisted(event.getCause(), event.getWorld(), false)) return; // Whitelisted cause
@@ -460,7 +460,7 @@ public class RegionProtectionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onDamageEntity(DamageEntityEvent event) {
-        if(getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
         if (event.getResult() == Result.ALLOW) return; // Don't care about events that have been pre-allowed
         if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
         // Whitelist check is below
@@ -538,7 +538,7 @@ public class RegionProtectionListener extends AbstractListener {
 
     @EventHandler
     public void onEntityMount(EntityMountEvent event) {
-        if(getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         Entity vehicle = event.getMount();
         if (!isRegionSupportEnabled(vehicle.getWorld())) return; // Region support disabled
         if (!(event.getEntity() instanceof Player player)) {

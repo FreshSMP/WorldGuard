@@ -63,7 +63,7 @@ public class PlayerModesListener extends AbstractListener {
 
     @EventHandler
     public void onProcessPlayer(ProcessPlayerEvent event) {
-        if(getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
         Player player = event.getPlayer();
         LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
         Session session = WorldGuard.getInstance().getPlatform().getSessionManager().get(localPlayer);

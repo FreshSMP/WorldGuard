@@ -62,7 +62,7 @@ public class PlayerMoveListener extends AbstractListener implements Runnable {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerRespawn(PlayerRespawnEvent event) {
-        if(getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
         LocalPlayer player = getPlugin().wrapPlayer(event.getPlayer());
 
         Session session = WorldGuard.getInstance().getPlatform().getSessionManager().get(player);
@@ -147,7 +147,7 @@ public class PlayerMoveListener extends AbstractListener implements Runnable {
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        if(getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
         final Player player = event.getPlayer();
         LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
 
@@ -165,7 +165,7 @@ public class PlayerMoveListener extends AbstractListener implements Runnable {
 
     @EventHandler
     public void onEntityMount(EntityMountEvent event) {
-        if(getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         Entity entity = event.getEntity();
         if (entity instanceof Player) {
             LocalPlayer player = getPlugin().wrapPlayer((Player) entity);

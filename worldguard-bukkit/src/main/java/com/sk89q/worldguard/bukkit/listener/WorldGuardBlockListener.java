@@ -81,7 +81,7 @@ public class WorldGuardBlockListener extends AbstractListener {
      */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
-        if(getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         Player player = event.getPlayer();
         WorldConfiguration wcfg = getWorldConfig(player.getWorld());
 
@@ -101,7 +101,7 @@ public class WorldGuardBlockListener extends AbstractListener {
      */
     @EventHandler(ignoreCancelled = true)
     public void onBlockFromTo(BlockFromToEvent event) {
-        if(getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         World world = event.getBlock().getWorld();
         Block blockFrom = event.getBlock();
         Block blockTo = event.getToBlock();
@@ -189,7 +189,7 @@ public class WorldGuardBlockListener extends AbstractListener {
      */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockIgnite(BlockIgniteEvent event) {
-        if(getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         IgniteCause cause = event.getCause();
         Block block = event.getBlock();
         World world = block.getWorld();
@@ -282,7 +282,7 @@ public class WorldGuardBlockListener extends AbstractListener {
      */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockBurn(BlockBurnEvent event) {
-        if(getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         ConfigurationManager cfg = getConfig();
 
         if (cfg.activityHaltToggle) {
@@ -355,7 +355,7 @@ public class WorldGuardBlockListener extends AbstractListener {
      */
     @EventHandler(ignoreCancelled = true)
     public void onBlockPhysics(BlockPhysicsEvent event) {
-        if(getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         ConfigurationManager cfg = getConfig();
 
         if (cfg.activityHaltToggle) {
@@ -394,7 +394,7 @@ public class WorldGuardBlockListener extends AbstractListener {
      */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent event) {
-        if(getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         Block target = event.getBlock();
         World world = target.getWorld();
 
@@ -418,7 +418,7 @@ public class WorldGuardBlockListener extends AbstractListener {
      */
     @EventHandler(priority = EventPriority.HIGH)
     public void onBlockRedstoneChange(BlockRedstoneEvent event) {
-        if(getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         Block blockTo = event.getBlock();
         World world = blockTo.getWorld();
 
@@ -450,7 +450,7 @@ public class WorldGuardBlockListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onLeavesDecay(LeavesDecayEvent event) {
-        if(getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         ConfigurationManager cfg = getConfig();
 
         if (cfg.activityHaltToggle) {
@@ -477,7 +477,7 @@ public class WorldGuardBlockListener extends AbstractListener {
      */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockForm(BlockFormEvent event) {
-        if(getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         ConfigurationManager cfg = getConfig();
 
         if (cfg.activityHaltToggle) {
@@ -549,7 +549,7 @@ public class WorldGuardBlockListener extends AbstractListener {
      */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockSpread(BlockSpreadEvent event) {
-        if(getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         ConfigurationManager cfg = getConfig();
 
         if (cfg.activityHaltToggle) {
@@ -641,7 +641,7 @@ public class WorldGuardBlockListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockGrow(BlockGrowEvent event) {
-        if(getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         Location loc = event.getBlock().getLocation();
         final Material type = event.getNewState().getType();
 
@@ -669,7 +669,7 @@ public class WorldGuardBlockListener extends AbstractListener {
      */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockFade(BlockFadeEvent event) {
-        if(getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
 
         WorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
 
@@ -726,7 +726,7 @@ public class WorldGuardBlockListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockExplode(BlockExplodeEvent event) {
-        if(getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         ConfigurationManager cfg = getConfig();
 
         if (cfg.activityHaltToggle) {
@@ -745,7 +745,7 @@ public class WorldGuardBlockListener extends AbstractListener {
      */
     @EventHandler(ignoreCancelled = true)
     public void onMoistureChange(MoistureChangeEvent event) {
-        if(getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         WorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
 
         if (wcfg.disableSoilMoistureChange) {

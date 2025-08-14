@@ -72,7 +72,7 @@ public class BlockedPotionsListener extends AbstractListener {
 
     @EventHandler
     public void onProjectile(DamageEntityEvent event) {
-        if(getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
         if (!(event.getOriginalEvent() instanceof EntityDamageByEntityEvent originalEvent)) {
             return;
         }
@@ -104,7 +104,7 @@ public class BlockedPotionsListener extends AbstractListener {
 
     @EventHandler
     public void onItemInteract(UseItemEvent event) {
-        if(getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
         BukkitWorldConfiguration wcfg = getWorldConfig(event.getWorld());
         ItemStack item = event.getItemStack();
 

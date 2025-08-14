@@ -289,15 +289,11 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         disableCopperBlockFade = getBoolean("dynamics.disable-copper-block-fade", false);
         allowedSnowFallOver = new HashSet<>(convertLegacyBlocks(getStringList("dynamics.snow-fall-blocks", null)));
 
-//        enabledNotDisabled = getBoolean("events.enabled-not-disabled", false);
-//        disabledEvents = new HashSet<>(getStringList("events.disabled", null).stream().toList());
-        worldEventChecker =
-                new WorldEventChecker(
-                        new HashSet<>(getStringList("events.disabled", null)), getBoolean("events.whitelist-mode", false));
+        worldEventChecker = new WorldEventChecker(new HashSet<>(getStringList("events.disabled", null)), getBoolean("events.whitelist-mode", false));
 
         useRegions = getBoolean("regions.enable", true);
         regionInvinciblityRemovesMobs = getBoolean("regions.invincibility-removes-mobs", false);
-        regionCancelEmptyChatEvents = getBoolean("regions.cancel-chat-wi-recipients", true);
+        regionCancelEmptyChatEvents = getBoolean("regions.cancel-chat-without-recipients", true);
         regionNetherPortalProtection = getBoolean("regions.nether-portal-protection", true);
         forceDefaultTitleTimes = config.getBoolean("regions.titles-always-use-default-times", true); // note: technically not region-specific, but we only use it for the title flags
         fakePlayerBuildOverride = getBoolean("regions.fake-player-build-override", true);
