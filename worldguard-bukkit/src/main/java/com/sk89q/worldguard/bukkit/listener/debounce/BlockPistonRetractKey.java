@@ -22,7 +22,6 @@ package com.sk89q.worldguard.bukkit.listener.debounce;
 import org.bukkit.block.Block;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 
-
 public class BlockPistonRetractKey {
 
     private final Block piston;
