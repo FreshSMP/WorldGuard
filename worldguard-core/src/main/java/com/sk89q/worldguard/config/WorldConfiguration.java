@@ -29,6 +29,7 @@ import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.blacklist.Blacklist;
+import com.sk89q.worldguard.util.WorldEventChecker;
 
 import java.io.File;
 import java.util.List;
@@ -83,6 +84,7 @@ public abstract class WorldConfiguration {
     public boolean noPhysicsSand;
     public boolean ropeLadders;
     public boolean allowPortalAnywhere;
+    public WorldEventChecker worldEventChecker;
     public Set<String> preventWaterDamage;
     public boolean blockLighter;
     public boolean disableFireSpread;
@@ -211,13 +213,13 @@ public abstract class WorldConfiguration {
             }
             ItemType legacyItem = LegacyMapper.getInstance().getItemFromLegacy(id, data);
             if (legacyItem != null) {
-                return legacyItem.getId();
+                return legacyItem.id();
             }
         } catch (NumberFormatException ignored) {
         }
         final ItemType itemType = ItemTypes.get(legacy);
         if (itemType != null) {
-            return itemType.getId();
+            return itemType.id();
         }
 
         return null;
@@ -241,13 +243,13 @@ public abstract class WorldConfiguration {
             }
             BlockState legacyBlock = LegacyMapper.getInstance().getBlockFromLegacy(id, data);
             if (legacyBlock != null) {
-                return legacyBlock.getBlockType().getId();
+                return legacyBlock.getBlockType().id();
             }
         } catch (NumberFormatException ignored) {
         }
         final BlockType blockType = BlockTypes.get(legacy);
         if (blockType != null) {
-            return blockType.getId();
+            return blockType.id();
         }
 
         return null;
