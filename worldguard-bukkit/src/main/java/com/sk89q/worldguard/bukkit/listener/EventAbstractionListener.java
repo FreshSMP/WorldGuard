@@ -202,6 +202,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         Events.fireToCancel(event, new BreakBlockEvent(event, create(event.getPlayer()), event.getBlock()));
 
         if (event.isCancelled()) {
@@ -211,6 +212,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockMultiPlace(BlockMultiPlaceEvent event) {
+        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
         List<Block> placed = event.getReplacedBlockStates().stream().map(BlockState::getBlock).collect(Collectors.toList());
         int origAmt = placed.size();
         PlaceBlockEvent delegateEvent = new PlaceBlockEvent(event, create(event.getPlayer()), event.getBlock().getWorld(),
@@ -223,6 +225,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent event) {
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         if (event instanceof BlockMultiPlaceEvent) return;
         BlockState previousState = event.getBlockReplacedState();
 
@@ -247,6 +250,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockBurn(BlockBurnEvent event) {
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         Block target = event.getBlock();
 
         Block[] adjacent = {
@@ -278,6 +282,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onStructureGrowEvent(StructureGrowEvent event) {
+        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
         int originalCount = event.getBlocks().size();
 
         Player player = event.getPlayer();
@@ -328,6 +333,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityChangeBlock(EntityChangeBlockEvent event) {
+        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         Block block = event.getBlock();
         Entity entity = event.getEntity();
         Material toType = event.getTo();
@@ -383,6 +389,7 @@ public class EventAbstractionListener extends AbstractListener {
     @SuppressWarnings("UnstableApiUsage")
     @EventHandler(ignoreCancelled = true)
     public void onEntityExplode(EntityExplodeEvent event) {
+        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         Entity entity = event.getEntity();
         if (event.getExplosionResult() == ExplosionResult.TRIGGER_BLOCK) {
             UseBlockEvent useEvent = new UseBlockEvent(event, create(entity), event.getLocation().getWorld(), event.blockList(), Material.AIR);
@@ -398,8 +405,8 @@ public class EventAbstractionListener extends AbstractListener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
     public void onBlockPistonRetract(BlockPistonRetractEvent event) {
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         if (event.isSticky()) {
             EventDebounce.Entry entry = pistonRetractDebounce.getIfNotPresent(new BlockPistonRetractKey(event), event);
             if (entry != null) {
@@ -429,8 +436,8 @@ public class EventAbstractionListener extends AbstractListener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
     public void onBlockPistonExtend(BlockPistonExtendEvent event) {
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         EventDebounce.Entry entry = pistonExtendDebounce.getIfNotPresent(new BlockPistonExtendKey(event), event);
         if (entry != null) {
             Cause cause = create(event.getBlock());
@@ -468,6 +475,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockDamage(BlockDamageEvent event) {
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         Block target = event.getBlock();
 
         // Previously, and perhaps still, the only way to catch cake eating
@@ -479,6 +487,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
+        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
         Player player = event.getPlayer();
         @Nullable ItemStack item = event.getItem();
         Block clicked = event.getClickedBlock();
@@ -597,6 +606,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityBlockForm(EntityBlockFormEvent event) {
+        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         entityBreakBlockDebounce.debounce(event.getBlock(), event.getEntity(), event,
                 new PlaceBlockEvent(event, create(event.getEntity()),
                         event.getBlock().getLocation(), event.getNewState().getType()));
@@ -604,13 +614,14 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityInteract(EntityInteractEvent event) {
+        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         interactDebounce.debounce(event.getBlock(), event.getEntity(), event,
                 new UseBlockEvent(event, create(event.getEntity()),
                         event.getBlock()).setAllowed(hasInteractBypass(event.getBlock())));
     }
 
-    @EventHandler(ignoreCancelled = true)
     public void onBlockFertilize(BlockFertilizeEvent event) {
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         if (event.getBlocks().isEmpty()) return;
         Cause cause = create(event.getPlayer(), event.getBlock());
         Events.fireToCancel(event, new PlaceBlockEvent(event, cause, event.getBlock().getWorld(), event.getBlocks()));
@@ -618,6 +629,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockIgnite(BlockIgniteEvent event) {
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         Block block = event.getBlock();
         Cause cause;
 
@@ -637,6 +649,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onSignChange(SignChangeEvent event) {
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         if (Events.fireToCancel(event, new PlaceBlockEvent(event, create(event.getPlayer()), event.getBlock()))) {
             playDenyEffect(event.getPlayer(), event.getBlock().getLocation().add(0.5, 0.5, 0.5));
         }
@@ -644,11 +657,13 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBedEnter(PlayerBedEnterEvent event) {
+        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
         Events.fireToCancel(event, new UseBlockEvent(event, create(event.getPlayer()), event.getBed()));
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         Player player = event.getPlayer();
         Block blockClicked = event.getBlockClicked();
         Block blockAffected;
@@ -678,6 +693,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerBucketFill(PlayerBucketFillEvent event) {
+        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
         Player player = event.getPlayer();
         Block blockAffected = event.getBlockClicked().getRelative(event.getBlockFace());
         boolean allowed = false;
@@ -689,7 +705,7 @@ public class EventAbstractionListener extends AbstractListener {
 
         ItemStack item = new ItemStack(event.getBucket(), 1);
         Events.fireToCancel(event, new BreakBlockEvent(event, create(player), blockAffected).setAllowed(allowed));
-        Events.fireToCancel(event, new UseItemEvent(event, create(player), player.getWorld(), item).setAllowed(allowed));
+        Events.fireToCancel(event, new UseItemEvent(event, create(player), player.getPlayer().getWorld(), item).setAllowed(allowed));
 
         if (event.isCancelled()) {
             playDenyEffect(event.getPlayer(), blockAffected.getLocation().add(0.5, 0.5, 0.5));
@@ -702,8 +718,8 @@ public class EventAbstractionListener extends AbstractListener {
     // Block self-interaction
     //-------------------------------------------------------------------------
 
-    @EventHandler(ignoreCancelled = true)
     public void onBlockFromTo(BlockFromToEvent event) {
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         WorldConfiguration config = getWorldConfig(event.getBlock().getWorld());
 
         // This only applies to regions but nothing else cares about high
@@ -746,6 +762,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onCreatureSpawn(CreatureSpawnEvent event) {
+        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         switch (event.getSpawnReason()) {
             case DISPENSE_EGG:
             case EGG:
@@ -760,6 +777,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onHangingPlace(HangingPlaceEvent event) {
+        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         Events.fireToCancel(event, new SpawnEntityEvent(event, create(event.getPlayer()), event.getEntity()));
 
         if (event.isCancelled()) {
@@ -770,6 +788,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onHangingBreak(HangingBreakEvent event) {
+        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         if (event instanceof HangingBreakByEntityEvent) {
             Entity remover = ((HangingBreakByEntityEvent) event).getRemover();
             Events.fireToCancel(event, new DestroyEntityEvent(event, create(remover), event.getEntity()));
@@ -791,11 +810,13 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onVehicleDestroy(VehicleDestroyEvent event) {
+        if (getWorldConfig(event.getVehicle().getWorld()).isEventDisabled(event.getEventName())) return;
         Events.fireToCancel(event, new DestroyEntityEvent(event, create(event.getAttacker()), event.getVehicle()));
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockExp(BlockExpEvent event) {
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         if (event.getExpToDrop() > 0) { // Event is raised even where no XP is being dropped
             if (Events.fireAndTestCancel(new SpawnEntityEvent(event, create(event.getBlock()), event.getBlock().getLocation(), EntityType.EXPERIENCE_ORB))) {
                 event.setExpToDrop(0);
@@ -805,6 +826,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerFish(PlayerFishEvent event) {
+        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
         if (event.getState() == PlayerFishEvent.State.FISHING) {
             if (Events.fireAndTestCancel(new UseItemEvent(event, create(event.getPlayer(), event.getHook()),
                     event.getPlayer().getWorld(),
@@ -830,13 +852,14 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onProjectileHit(ProjectileHitEvent event) {
+        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         if (event.getEntity() instanceof FishHook hook && event.getHitEntity() instanceof Entity target) {
             Events.fireToCancel(event, new DamageEntityEvent(event, create(hook), target));
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
     public void onExpBottle(ExpBottleEvent event) {
+        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         if (Events.fireAndTestCancel(new SpawnEntityEvent(event, create(event.getEntity()), event.getEntity().getLocation(), EntityType.EXPERIENCE_ORB))) {
             event.setExperience(0);
 
@@ -853,6 +876,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityDeath(EntityDeathEvent event) {
+        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         if (event.getDroppedExp() > 0) {
             if (Events.fireAndTestCancel(new SpawnEntityEvent(event, create(event.getEntity()), event.getEntity().getLocation(), EntityType.EXPERIENCE_ORB))) {
                 event.setDroppedExp(0);
@@ -866,8 +890,9 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
         Player player = event.getPlayer();
-        World world = player.getWorld();
+        World world = player.getPlayer().getWorld();
         ItemStack item = event.getHand() == EquipmentSlot.OFF_HAND
                 ? player.getInventory().getItemInOffHand() : player.getInventory().getItemInMainHand();
         Entity entity = event.getRightClicked();
@@ -885,6 +910,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityDamage(EntityDamageEvent event) {
+        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         if (event instanceof EntityDamageByBlockEvent) {
             @Nullable Block attacker = ((EntityDamageByBlockEvent) event).getDamager();
 
@@ -925,6 +951,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityCombust(EntityCombustEvent event) {
+        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         if (event instanceof EntityCombustByBlockEvent combustByBlockEvent) {
             // at the time of writing, spigot is throwing null for the event's combuster. this causes lots of issues downstream.
             // whenever (i mean if ever) it is fixed, use getCombuster again instead of the current block
@@ -947,6 +974,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityLeash(PlayerLeashEntityEvent event) {
+        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         UseEntityEvent useEntityEvent = new UseEntityEvent(event, create(event.getPlayer()), event.getEntity());
         useEntityEvent.getRelevantFlags().add(Flags.RIDE);
         useEntityEvent.getRelevantFlags().add(Flags.INTERACT);
@@ -955,6 +983,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityUnleash(EntityUnleashEvent event) {
+        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         if (event instanceof PlayerUnleashEntityEvent playerEvent) {
             Events.fireToCancel(playerEvent, new UseEntityEvent(playerEvent, create(playerEvent.getPlayer()), event.getEntity()));
         }
@@ -962,33 +991,39 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityTame(EntityTameEvent event) {
+        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         Events.fireToCancel(event, new UseEntityEvent(event, create(event.getOwner()), event.getEntity()));
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerShearEntity(PlayerShearEntityEvent event) {
+        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         Events.fireToCancel(event, new UseEntityEvent(event, create(event.getPlayer()), event.getEntity()));
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerPickupItem(PlayerPickupItemEvent event) {
+        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
         Item item = event.getItem();
         pickupDebounce.debounce(event.getPlayer(), item, event, new DestroyEntityEvent(event, create(event.getPlayer()), event.getItem()));
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityPickupItem(EntityPickupItemEvent event) {
+        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         Item item = event.getItem();
         pickupDebounce.debounce(event.getEntity(), item, event, new DestroyEntityEvent(event, create(event.getEntity()), event.getItem()));
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerDropItem(PlayerDropItemEvent event) {
+        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
         Events.fireToCancel(event, new SpawnEntityEvent(event, create(event.getPlayer()), event.getItemDrop()));
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onVehicleDamage(VehicleDamageEvent event) {
+        if (getWorldConfig(event.getVehicle().getWorld()).isEventDisabled(event.getEventName())) return;
         Entity attacker = event.getAttacker();
         if (attacker == null) return;
         attacker.getScheduler().run(getPlugin(), scheduledTask -> Events.fireToCancel(event, new DamageEntityEvent(event, create(attacker), event.getVehicle())), null);
@@ -1000,11 +1035,13 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerItemConsume(PlayerItemConsumeEvent event) {
+        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
         Events.fireToCancel(event, new UseItemEvent(event, create(event.getPlayer()), event.getPlayer().getWorld(), event.getItem()));
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onInventoryOpen(InventoryOpenEvent event) {
+        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
         Player player = (Player) event.getPlayer();
         Location location = player.getLocation();
 
@@ -1018,6 +1055,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onInventoryMoveItem(InventoryMoveItemEvent event) {
+        if (getWorldConfig(event.getDestination().getLocation().getWorld()).isEventDisabled(event.getEventName())) return;
         InventoryHolder causeHolder = PaperLib.getHolder(event.getInitiator(), false).getHolder();
 
         WorldConfiguration wcfg = null;
@@ -1064,6 +1102,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPotionSplash(PotionSplashEvent event) {
+        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         Entity entity = event.getEntity();
         ThrownPotion potion = event.getPotion();
         World world = entity.getWorld();
@@ -1102,6 +1141,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockDispense(BlockDispenseEvent event) {
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         Block dispenserBlock = event.getBlock();
 
         // Simulate right click event as players have it
@@ -1133,6 +1173,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onLingeringSplash(LingeringPotionSplashEvent event) {
+        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         AreaEffectCloud aec = event.getAreaEffectCloud();
         ThrownPotion potion = event.getEntity();
         World world = potion.getWorld();
@@ -1150,6 +1191,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onLingeringApply(AreaEffectCloudApplyEvent event) {
+        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         AreaEffectCloud entity = event.getEntity();
         List<PotionEffect> effects = new ArrayList<>();
         List<PotionEffect> baseEffectTypes = entity.getBasePotionType() == null ? null : entity.getBasePotionType().getPotionEffects();
@@ -1169,11 +1211,13 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent event) {
+        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
         onPlayerInteractEntity(event);
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockExplode(BlockExplodeEvent event) {
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         final BreakBlockEvent eventToFire = new BreakBlockEvent(event, create(event.getBlock()),
                 event.getBlock().getLocation().getWorld(), event.blockList(), Material.AIR);
         eventToFire.getRelevantFlags().add(Flags.OTHER_EXPLOSION);
@@ -1182,12 +1226,14 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onTakeLecternBook(PlayerTakeLecternBookEvent event) {
+        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
         final UseBlockEvent useEvent = new UseBlockEvent(event, create(event.getPlayer()), event.getLectern().getBlock());
         Events.fireToCancel(event, useEvent);
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onCauldronLevelChange(CauldronLevelChangeEvent event) {
+        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         if (event.getEntity() == null) return;
         interactDebounce.debounce(event.getBlock(), event.getEntity(), event,
                 new UseBlockEvent(event, create(event.getEntity()),
@@ -1330,11 +1376,13 @@ public class EventAbstractionListener extends AbstractListener {
     private static class PaperListener implements Listener {
         @EventHandler(ignoreCancelled = true)
         public void onEntityTransform(EntityZapEvent event) {
+            if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
             Events.fireToCancel(event, new DamageEntityEvent(event, create(event.getBolt()), event.getEntity()));
         }
 
         @EventHandler(ignoreCancelled = true)
         public void onSignOpen(PlayerOpenSignEvent event) {
+            if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
             if (event.getCause() == PlayerOpenSignEvent.Cause.INTERACT) {
                 // other cases are handled by other events
                 Events.fireToCancel(event, new UseBlockEvent(event, create(event.getPlayer()), event.getSign().getBlock()));
@@ -1343,6 +1391,7 @@ public class EventAbstractionListener extends AbstractListener {
 
         @EventHandler(ignoreCancelled = true)
         public void onEntityKnockbackByEntity(EntityPushedByEntityAttackEvent event) {
+            if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
             handleKnockback(event, event.getPushedBy());
         }
     }
@@ -1351,6 +1400,7 @@ public class EventAbstractionListener extends AbstractListener {
     private static class SpigotListener implements Listener {
         @EventHandler(ignoreCancelled = true)
         public void onEntityKnockbackByEntity(EntityKnockbackByEntityEvent event) {
+            if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
             handleKnockback(event, event.getSourceEntity());
         }
     }

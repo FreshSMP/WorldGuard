@@ -73,6 +73,7 @@ import com.sk89q.worldguard.protection.managers.storage.RegionDriver;
 import com.sk89q.worldguard.protection.managers.storage.file.DirectoryYamlDriver;
 import com.sk89q.worldguard.protection.managers.storage.sql.SQLDriver;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.util.WorldEventChecker;
 import com.sk89q.worldguard.util.logging.RecordMessagePrefixer;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bstats.bukkit.Metrics;
@@ -215,6 +216,10 @@ public class WorldGuardPlugin extends JavaPlugin {
             }
 
         ((SimpleFlagRegistry) WorldGuard.getInstance().getFlagRegistry()).setInitialized(true);
+
+        for (BukkitWorldConfiguration worldConfig : platform.getGlobalStateManager().getWorldConfigs()) {
+            WorldEventChecker.register(worldConfig.getWorldEventChecker());
+        }
 
         // Enable metrics
         final Metrics metrics = new Metrics(this, BSTATS_PLUGIN_ID); // bStats plugin id
