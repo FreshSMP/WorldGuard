@@ -22,9 +22,7 @@ package com.sk89q.worldguard.util;
 import java.util.Collections;
 import java.util.Set;
 
-public class WorldEventChecker {
-    private final Set<String> events;
-    private final boolean whitelistMode;
+public record WorldEventChecker(Set<String> events, boolean whitelistMode) {
 
     public WorldEventChecker(Set<String> events, boolean whitelistMode) {
         this.events = events != null ?
@@ -38,7 +36,7 @@ public class WorldEventChecker {
             return whitelistMode;
         }
 
-        if(events.isEmpty() && whitelistMode){
+        if (events.isEmpty() && whitelistMode) {
             return true;
         }
 
