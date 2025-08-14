@@ -46,6 +46,7 @@ public class WorldGuardVehicleListener extends AbstractListener {
 
     @EventHandler
     public void onVehicleMove(VehicleMoveEvent event) {
+        if (getWorldConfig(event.getVehicle().getWorld()).isEventDisabled(event.getEventName())) return;
         Vehicle vehicle = event.getVehicle();
         if (vehicle.getPassengers().isEmpty()) return;
         List<Player> playerPassengers = vehicle.getPassengers().stream()
