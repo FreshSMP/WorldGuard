@@ -242,7 +242,7 @@ public class BlacklistListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerDropItem(PlayerDropItemEvent event) {
-        if(getWorldConfig(event.getItemDrop().getWorld()).isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getItemDrop().getWorld()).isEventDisabled(event.getEventName())) return;
         WorldConfiguration wcfg = getWorldConfig(event.getPlayer().getWorld());
 
         if (wcfg.getBlacklist() != null) {
@@ -322,7 +322,7 @@ public class BlacklistListener extends AbstractListener {
     }
 
     private ItemStack checkEquipped(InventoryClickEvent event) {
-        if(getWorldConfig(event.getWhoClicked().getWorld()).isEventDisabled(event.getEventName())) return null;
+        if (getWorldConfig(event.getWhoClicked().getWorld()).isEventDisabled(event.getEventName())) return null;
         final Inventory clickedInventory = event.getClickedInventory();
         if (event.getSlotType() == InventoryType.SlotType.ARMOR) {
             switch (event.getAction()) {

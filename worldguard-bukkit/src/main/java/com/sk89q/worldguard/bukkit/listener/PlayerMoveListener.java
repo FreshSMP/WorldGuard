@@ -71,7 +71,7 @@ public class PlayerMoveListener extends AbstractListener implements Runnable {
 
     @EventHandler
     public void onVehicleEnter(VehicleEnterEvent event) {
-        if(getWorldConfig(event.getVehicle().getWorld()).isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getVehicle().getWorld()).isEventDisabled(event.getEventName())) return;
         Entity entity = event.getEntered();
         if (entity instanceof Player) {
             LocalPlayer player = getPlugin().wrapPlayer((Player) entity);

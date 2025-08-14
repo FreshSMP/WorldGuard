@@ -560,7 +560,7 @@ public class RegionProtectionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onVehicleExit(VehicleExitEvent event) {
-        if(getWorldConfig(event.getVehicle().getWorld()).isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getVehicle().getWorld()).isEventDisabled(event.getEventName())) return;
         Entity vehicle = event.getVehicle();
         if (!isRegionSupportEnabled(vehicle.getWorld())) return; // Region support disabled
         Entity exited = event.getExited();

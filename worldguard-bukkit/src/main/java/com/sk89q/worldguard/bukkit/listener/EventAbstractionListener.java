@@ -809,7 +809,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onVehicleDestroy(VehicleDestroyEvent event) {
-        if(getWorldConfig(event.getVehicle().getWorld()).isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getVehicle().getWorld()).isEventDisabled(event.getEventName())) return;
         Events.fireToCancel(event, new DestroyEntityEvent(event, create(event.getAttacker()), event.getVehicle()));
     }
 
@@ -1019,7 +1019,7 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onVehicleDamage(VehicleDamageEvent event) {
-        if(getWorldConfig(event.getVehicle().getWorld()).isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getVehicle().getWorld()).isEventDisabled(event.getEventName())) return;
         Entity attacker = event.getAttacker();
         Events.fireToCancel(event, new DamageEntityEvent(event, create(attacker), event.getVehicle()));
     }
