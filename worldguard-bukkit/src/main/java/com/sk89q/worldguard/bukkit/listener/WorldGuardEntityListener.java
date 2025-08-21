@@ -719,17 +719,29 @@ public class WorldGuardEntityListener extends AbstractListener {
                 BlockVector3 max = null;
                 for (BlockState block : event.getBlocks()) {
                     BlockVector3 loc = BlockVector3.at(block.getX(), block.getY(), block.getZ());
-                    min = min == null ? loc : loc.getMinimum(min);
-                    max = max == null ? loc : loc.getMaximum(max);
+                    min = (min == null) ? loc : loc.getMinimum(min);
+                    max = (max == null) ? loc : loc.getMaximum(max);
                 }
                 ProtectedCuboidRegion target = new ProtectedCuboidRegion("__portal_check", true, min, max);
                 regions = regionManager.getApplicableRegions(target);
             }
 
             final RegionAssociable associable = (cause != null) ? createRegionAssociable(cause) : null;
-            final State buildState = StateFlag.denyToNone(regions.queryState(associable, Flags.BUILD));
-            if (!StateFlag.test(buildState, regions.queryState(associable, Flags.BLOCK_BREAK))
-                    || !StateFlag.test(buildState, regions.queryState(associable, Flags.BLOCK_PLACE))) {
+
+            // Evaluate place/break with whatever associable is available
+            final boolean canBreak = regions.testState(associable, Flags.BLOCK_BREAK);
+            final boolean canPlace = regions.testState(associable, Flags.BLOCK_PLACE);
+
+            // IMPORTANT: BUILD requires a non-null *player* subject. Only check it when we actually have one.
+            final boolean canBuild = (localPlayer != null) && regions.testState(localPlayer, Flags.BUILD);
+
+            // For player-caused portals, require BUILD + BREAK + PLACE.
+            // For non-player portals, require BREAK + PLACE (skip BUILD to avoid NPE and match WG semantics).
+            final boolean allowed = (localPlayer != null)
+                    ? (canBuild && canBreak && canPlace)
+                    : (canBreak && canPlace);
+
+            if (!allowed) {
                 if (localPlayer != null && (cause == null || !cause.isIndirect())) {
                     // NB there is no way to cancel the teleport without PTA (since PlayerPortal doesn't have block info)
                     // removing PTA was a mistake
