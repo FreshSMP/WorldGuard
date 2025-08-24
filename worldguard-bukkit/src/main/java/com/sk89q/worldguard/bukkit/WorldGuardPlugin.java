@@ -153,11 +153,6 @@ public class WorldGuardPlugin extends JavaPlugin {
 
         WorldGuard.getInstance().setPlatform(platform = new BukkitWorldGuardPlatform()); // Initialise WorldGuard
         WorldGuard.getInstance().setup();
-
-        for (World world : getServer().getWorlds()) {
-            platform.getGlobalStateManager().get(BukkitAdapter.adapt(world));
-        }
-
         BukkitSessionManager sessionManager = (BukkitSessionManager) platform.getSessionManager();
 
         // Set the proper command injector
