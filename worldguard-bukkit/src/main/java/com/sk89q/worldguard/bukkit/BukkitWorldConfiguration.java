@@ -487,8 +487,4 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         return chestProtection;
     }
 
-    public WorldEventChecker getWorldEventChecker() {
-        return worldEventChecker;
-    }
-
 }

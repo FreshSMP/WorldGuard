@@ -37,7 +37,6 @@ import com.sk89q.worldguard.session.MoveType;
 import com.sk89q.worldguard.session.Session;
 import com.sk89q.worldguard.session.handler.GameModeFlag;
 import com.sk89q.worldguard.util.Entities;
-import com.sk89q.worldguard.util.WorldEventChecker;
 import com.sk89q.worldguard.util.command.CommandFilter;
 import com.sk89q.worldguard.util.profile.Profile;
 import org.bukkit.Bukkit;
@@ -90,7 +89,6 @@ public class WorldGuardPlayerListener extends AbstractListener {
 
     @EventHandler
     public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
-        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
         Player player = event.getPlayer();
         LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
         WorldConfiguration wcfg = getWorldConfig(player.getWorld());
@@ -110,7 +108,6 @@ public class WorldGuardPlayerListener extends AbstractListener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
         Player player = event.getPlayer();
         World world = player.getWorld();
 
@@ -151,7 +148,6 @@ public class WorldGuardPlayerListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerChat(AsyncPlayerChatEvent event) {
-        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
         Player player = event.getPlayer();
         LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
         WorldConfiguration wcfg = getWorldConfig(player.getWorld());
@@ -183,10 +179,6 @@ public class WorldGuardPlayerListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerLogin(AsyncPlayerPreLoginEvent event) {
-        // This event cannot be checked "per/player" since its intention is
-        // the "PreLoginEvent" and not the "LoginEvent." Since you cannot get
-        // the player nor world, we can scope this as a global event for removal.
-        if (WorldEventChecker.isGloballyDisabled(event.getEventName())) return;
         UUID uuid = event.getUniqueId();
         String name = event.getName();
         ConfigurationManager cfg = getConfig();
@@ -217,7 +209,6 @@ public class WorldGuardPlayerListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
         Player player = event.getPlayer();
         World world = player.getWorld();
 
@@ -247,7 +238,6 @@ public class WorldGuardPlayerListener extends AbstractListener {
      * @param event Thrown event
      */
     private void handleBlockRightClick(PlayerInteractEvent event) {
-        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
         if (event.useItemInHand() == Event.Result.DENY) {
             return;
         }
@@ -306,7 +296,6 @@ public class WorldGuardPlayerListener extends AbstractListener {
      * @param event Thrown event
      */
     private void handlePhysicalInteract(PlayerInteractEvent event) {
-        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
         if (event.useInteractedBlock() == Event.Result.DENY) return;
 
         Player player = event.getPlayer();
@@ -331,7 +320,6 @@ public class WorldGuardPlayerListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerRespawn(PlayerRespawnEvent event) {
-        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
         Player player = event.getPlayer();
         if (com.sk89q.worldguard.bukkit.util.Entities.isNPC(player)) return;
         WorldConfiguration wcfg = getWorldConfig(player.getWorld());
@@ -351,7 +339,6 @@ public class WorldGuardPlayerListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onItemHeldChange(PlayerItemHeldEvent event) {
-        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
         Player player = event.getPlayer();
         WorldConfiguration wcfg = getWorldConfig(player.getWorld());
 
@@ -372,10 +359,6 @@ public class WorldGuardPlayerListener extends AbstractListener {
 
         Projectile entity = event.getEntity();
         if (!(entity.getShooter() instanceof Player player)) return;
-        if (getWorldConfig(player.getWorld()).isEventDisabled(event.getEventName())) {
-            return;
-        }
-
         if (com.sk89q.worldguard.bukkit.util.Entities.isNPC(player)) return;
         LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
         ConfigurationManager cfg = getConfig();
@@ -415,8 +398,7 @@ public class WorldGuardPlayerListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onChorusTeleport(PlayerTeleportEvent event) {
-        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
-        if (event.getCause() != TeleportCause.CONSUMABLE_EFFECT) return;
+        if (event.getCause() != TeleportCause.CHORUS_FRUIT) return;
 
         Player player = event.getPlayer();
         if (com.sk89q.worldguard.bukkit.util.Entities.isNPC(player)) return;
@@ -477,7 +459,6 @@ public class WorldGuardPlayerListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
-        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
         Player player = event.getPlayer();
         LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
         ConfigurationManager cfg = getConfig();

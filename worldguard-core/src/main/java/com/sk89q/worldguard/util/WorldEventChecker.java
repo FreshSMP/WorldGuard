@@ -21,35 +21,8 @@ package com.sk89q.worldguard.util;
 
 import java.util.Collections;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 public record WorldEventChecker(Set<String> events, boolean whitelistMode) {
-
-    private static final Set<WorldEventChecker> REGISTRY = ConcurrentHashMap.newKeySet();
-
-    public static void register(WorldEventChecker checker) {
-        if (checker != null) {
-            REGISTRY.add(checker);
-        }
-    }
-
-    public static boolean isGloballyDisabled(String eventName) {
-        if (REGISTRY.isEmpty()) {
-            return false;
-        }
-
-        for (WorldEventChecker checker : REGISTRY) {
-            if (!checker.isEventDisabled(eventName)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    public static void clearRegistry() {
-        REGISTRY.clear();
-    }
 
     public WorldEventChecker(Set<String> events, boolean whitelistMode) {
         this.events = events != null ?
