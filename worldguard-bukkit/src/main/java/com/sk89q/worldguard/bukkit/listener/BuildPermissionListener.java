@@ -59,7 +59,6 @@ public class BuildPermissionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlaceBlock(final PlaceBlockEvent event) {
-        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
         if (!getWorldConfig(event.getWorld()).buildPermissions) return;
 
         Object rootCause = event.getCause().getRootCause();
@@ -78,7 +77,6 @@ public class BuildPermissionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBreakBlock(final BreakBlockEvent event) {
-        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
         if (!getWorldConfig(event.getWorld()).buildPermissions) return;
 
         Object rootCause = event.getCause().getRootCause();
@@ -97,7 +95,6 @@ public class BuildPermissionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onUseBlock(final UseBlockEvent event) {
-        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
         if (!getWorldConfig(event.getWorld()).buildPermissions) return;
 
         Object rootCause = event.getCause().getRootCause();
@@ -118,7 +115,6 @@ public class BuildPermissionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onSpawnEntity(SpawnEntityEvent event) {
-        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
         if (!getWorldConfig(event.getWorld()).buildPermissions) return;
 
         Object rootCause = event.getCause().getRootCause();
@@ -137,7 +133,6 @@ public class BuildPermissionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onDestroyEntity(DestroyEntityEvent event) {
-        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
         if (!getWorldConfig(event.getWorld()).buildPermissions) return;
 
         Object rootCause = event.getCause().getRootCause();
@@ -156,7 +151,6 @@ public class BuildPermissionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onUseEntity(UseEntityEvent event) {
-        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
         if (!getWorldConfig(event.getWorld()).buildPermissions) return;
 
         Object rootCause = event.getCause().getRootCause();
@@ -175,7 +169,6 @@ public class BuildPermissionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onDamageEntity(DamageEntityEvent event) {
-        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
         if (!getWorldConfig(event.getWorld()).buildPermissions) return;
 
         Object rootCause = event.getCause().getRootCause();
@@ -194,7 +187,6 @@ public class BuildPermissionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onUseItem(UseItemEvent event) {
-        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
         if (!getWorldConfig(event.getWorld()).buildPermissions) return;
 
         Object rootCause = event.getCause().getRootCause();

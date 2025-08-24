@@ -57,7 +57,6 @@ public class InvincibilityListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityDamage(EntityDamageEvent event) {
-        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         Entity victim = event.getEntity();
         if (Entities.isNPC(victim)) return;
 
@@ -88,7 +87,6 @@ public class InvincibilityListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityCombust(EntityCombustEvent event) {
-        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         Entity entity = event.getEntity();
         if (Entities.isNPC(entity)) return;
 
@@ -103,7 +101,6 @@ public class InvincibilityListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onFoodLevelChange(FoodLevelChangeEvent event) {
-        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         if (Entities.isNPC(event.getEntity())) return;
 
         if (event.getEntity() instanceof Player player) {

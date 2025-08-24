@@ -56,7 +56,6 @@ public class ChestProtectionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlaceBlock(final PlaceBlockEvent event) {
-        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
         final Player player = event.getCause().getFirstPlayer();
 
         if (player != null) {
@@ -81,7 +80,6 @@ public class ChestProtectionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBreakBlock(final BreakBlockEvent event) {
-        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
         final Player player = event.getCause().getFirstPlayer();
 
         final BukkitWorldConfiguration wcfg = getWorldConfig(event.getWorld());
@@ -108,7 +106,6 @@ public class ChestProtectionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onUseBlock(final UseBlockEvent event) {
-        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
         final Player player = event.getCause().getFirstPlayer();
 
         final BukkitWorldConfiguration wcfg = getWorldConfig(event.getWorld());
@@ -135,7 +132,6 @@ public class ChestProtectionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onSignChange(SignChangeEvent event) {
-        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         Player player = event.getPlayer();
         final BukkitWorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
 

@@ -40,7 +40,6 @@ public class WorldRulesListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onSpawnEntity(final SpawnEntityEvent event) {
-        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
         if (event.getEffectiveType() == EntityType.EXPERIENCE_ORB) {
             WorldConfiguration config = getWorldConfig(event.getWorld());
 
@@ -52,7 +51,6 @@ public class WorldRulesListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPotionEffect(EntityPotionEffectEvent event) {
-        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         if (event.getCause() == EntityPotionEffectEvent.Cause.CONDUIT) {
             WorldConfiguration config = getWorldConfig(event.getEntity().getWorld());
 

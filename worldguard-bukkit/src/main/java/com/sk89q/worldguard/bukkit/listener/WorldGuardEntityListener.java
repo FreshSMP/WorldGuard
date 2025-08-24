@@ -110,7 +110,6 @@ public class WorldGuardEntityListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityInteract(EntityInteractEvent event) {
-        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         Block block = event.getBlock();
 
         WorldConfiguration wcfg = getWorldConfig(block.getWorld());
@@ -131,7 +130,6 @@ public class WorldGuardEntityListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onEntityDeath(EntityDeathEvent event) {
-        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         WorldConfiguration wcfg = getWorldConfig(event.getEntity().getWorld());
 
         if (event instanceof PlayerDeathEvent && wcfg.disableDeathMessages) {
@@ -140,7 +138,6 @@ public class WorldGuardEntityListener extends AbstractListener {
     }
 
     private void onEntityDamageByBlock(EntityDamageByBlockEvent event) {
-        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         Entity defender = event.getEntity();
         DamageCause type = event.getCause();
 
@@ -204,7 +201,6 @@ public class WorldGuardEntityListener extends AbstractListener {
     }
 
     private void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
 
         if (event.getDamager() instanceof Projectile) {
             onEntityDamageByProjectile(event);
@@ -291,7 +287,6 @@ public class WorldGuardEntityListener extends AbstractListener {
     }
 
     private void onEntityDamageByProjectile(EntityDamageByEntityEvent event) {
-        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         Entity defender = event.getEntity();
         Entity attacker;
         ProjectileSource source = ((Projectile) event.getDamager()).getShooter();
@@ -360,7 +355,6 @@ public class WorldGuardEntityListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityDamage(EntityDamageEvent event) {
-        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
 
         if (event instanceof EntityDamageByEntityEvent) {
             this.onEntityDamageByEntity((EntityDamageByEntityEvent) event);
@@ -452,7 +446,6 @@ public class WorldGuardEntityListener extends AbstractListener {
      */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityExplode(EntityExplodeEvent event) {
-        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         ConfigurationManager cfg = getConfig();
         Entity ent = event.getEntity();
 
@@ -574,7 +567,6 @@ public class WorldGuardEntityListener extends AbstractListener {
      */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onExplosionPrime(ExplosionPrimeEvent event) {
-        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         ConfigurationManager cfg = getConfig();
         Entity ent = event.getEntity();
 
@@ -621,7 +613,6 @@ public class WorldGuardEntityListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onCreatureSpawn(CreatureSpawnEvent event) {
-        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         ConfigurationManager cfg = getConfig();
 
         if (cfg.activityHaltToggle) {
@@ -684,13 +675,12 @@ public class WorldGuardEntityListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onCreatePortal(PortalCreateEvent event) {
-        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
-        WorldConfiguration wcfg = getWorldConfig(event.getEntity().getWorld());
+        WorldConfiguration wcfg = getWorldConfig(event.getWorld());
 
         if (wcfg.useRegions && wcfg.regionNetherPortalProtection
                 && event.getReason() == PortalCreateEvent.CreateReason.NETHER_PAIR
                 && !event.getBlocks().isEmpty()) {
-            final com.sk89q.worldedit.world.World world = BukkitAdapter.adapt(event.getEntity().getWorld());
+            final com.sk89q.worldedit.world.World world = BukkitAdapter.adapt(event.getWorld());
             final Cause cause = Cause.create(event.getEntity());
             LocalPlayer localPlayer = null;
             if (cause.getRootCause() instanceof Player player) {
@@ -740,7 +730,6 @@ public class WorldGuardEntityListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityTransform(EntityTransformEvent event) {
-        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         final Entity entity = event.getEntity();
         WorldConfiguration wcfg = getWorldConfig(entity.getWorld());
 
@@ -753,7 +742,6 @@ public class WorldGuardEntityListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPigZap(PigZapEvent event) {
-        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         final Entity entity = event.getEntity();
         WorldConfiguration wcfg = getWorldConfig(entity.getWorld());
 
@@ -764,7 +752,6 @@ public class WorldGuardEntityListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onCreeperPower(CreeperPowerEvent event) {
-        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         final Entity entity = event.getEntity();
         WorldConfiguration wcfg = getWorldConfig(entity.getWorld());
 
@@ -775,7 +762,6 @@ public class WorldGuardEntityListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityRegainHealth(EntityRegainHealthEvent event) {
-        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         RegainReason regainReason = event.getRegainReason();
         if (regainReason != RegainReason.REGEN && regainReason != RegainReason.SATIATED) {
             return;
@@ -800,7 +786,6 @@ public class WorldGuardEntityListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onFoodChange(FoodLevelChangeEvent event) {
-        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         if (event.getItem() != null) return;
         HumanEntity ent = event.getEntity();
         if (Entities.isNPC(ent)) return;
@@ -824,7 +809,6 @@ public class WorldGuardEntityListener extends AbstractListener {
      */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityChangeBlock(EntityChangeBlockEvent event) {
-        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         Entity ent = event.getEntity();
 
         WorldConfiguration wcfg = getWorldConfig(ent.getWorld());
@@ -867,7 +851,6 @@ public class WorldGuardEntityListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onVehicleEnter(VehicleEnterEvent event) {
-        if (getWorldConfig(event.getVehicle().getWorld()).isEventDisabled(event.getEventName())) return;
         BukkitWorldConfiguration wcfg = getWorldConfig(event.getEntered().getWorld());
 
         if (wcfg.blockEntityVehicleEntry && !(event.getEntered() instanceof Player)) {

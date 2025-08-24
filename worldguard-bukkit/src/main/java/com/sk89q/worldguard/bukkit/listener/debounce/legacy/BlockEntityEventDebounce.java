@@ -32,7 +32,8 @@ public class BlockEntityEventDebounce extends AbstractEventDebounce<Key> {
         super(debounceTime);
     }
 
-    public <T extends Event & Cancellable> void debounce(Block block, Entity entity, Cancellable originalEvent, T firedevent) {
+    public <T extends Event & Cancellable> void debounce(Block block, Entity entity, Cancellable originalEvent, T firedEvent) {
+        super.debounce(new Key(block, entity), originalEvent, firedEvent);
     }
 
     protected static class Key {

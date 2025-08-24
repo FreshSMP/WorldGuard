@@ -36,7 +36,6 @@ import com.sk89q.worldguard.blacklist.target.TargetMatcherParseException;
 import com.sk89q.worldguard.blacklist.target.TargetMatcherParser;
 import com.sk89q.worldguard.bukkit.chest.BukkitSignChestProtection;
 import com.sk89q.worldguard.bukkit.internal.TargetMatcherSet;
-import com.sk89q.worldguard.util.WorldEventChecker;
 import com.sk89q.worldguard.chest.ChestProtection;
 import com.sk89q.worldguard.commands.CommandUtils;
 import com.sk89q.worldguard.config.YamlWorldConfiguration;
@@ -289,8 +288,6 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         disableCopperBlockFade = getBoolean("dynamics.disable-copper-block-fade", false);
         allowedSnowFallOver = new HashSet<>(convertLegacyBlocks(getStringList("dynamics.snow-fall-blocks", null)));
 
-        worldEventChecker = new WorldEventChecker(new HashSet<>(getStringList("events.disabled", null)), getBoolean("events.whitelist-mode", false));
-
         useRegions = getBoolean("regions.enable", true);
         regionInvinciblityRemovesMobs = getBoolean("regions.invincibility-removes-mobs", false);
         regionCancelEmptyChatEvents = getBoolean("regions.cancel-chat-without-recipients", true);
@@ -300,7 +297,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         explosionFlagCancellation = getBoolean("regions.explosion-flags-block-entity-damage", true);
         highFreqFlags = getBoolean("regions.high-frequency-flags", false);
         checkLiquidFlow = getBoolean("regions.protect-against-liquid-flow", false);
-        regionWand = convertLegacyItem(getString("regions.wand", ItemTypes.LEATHER.id()));
+        regionWand = convertLegacyItem(getString("regions.wand", ItemTypes.LEATHER.getId()));
         maxClaimVolume = getInt("regions.max-claim-volume", 30000);
         claimOnlyInsideExistingRegions = getBoolean("regions.claim-only-inside-existing-regions", false);
         setParentOnClaim = getString("regions.set-parent-on-claim", "");
@@ -477,10 +474,6 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
             return false;
         }
         return chestProtection.isAdjacentChestProtected(block, player);
-    }
-
-    public boolean isEventDisabled(String eventName) {
-        return worldEventChecker.isEventDisabled(eventName);
     }
 
     public ChestProtection getChestProtection() {

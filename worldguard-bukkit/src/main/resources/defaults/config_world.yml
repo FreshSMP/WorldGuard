@@ -18,13 +18,4 @@
 # - Lines starting with # are comments and so they are ignored.
 #
 
-#
-# events.enabled-not-disable turns "disabled" into a whitelist.
-#
-
 # -- This should be automatically replaced by the plugin in-game --
-events:
-  whitelist-mode: false
-  disabled: []
-regions:
-  enable: true

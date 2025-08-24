@@ -15,20 +15,6 @@ WorldGuard lets you and players guard areas of land against griefers and undesir
 * Add useful commands like an immediate "STOP ALL FIRE SPREAD" command
 * Enable only features you want! Everything is off by default
 
-Implements per-world event whitelisting as seen in
-the `config.yml`. Check it out for more information!
-
-How to deactivate unused events:
-```yml
-events:
-    whitelist-mode: false
-    disabled: ["PlayerInteractEvent"]
-```
-
-Functionally, you can toggle `whitelist-mode` to disable all events; except those in `events.disabled`.
-
-(This also supports `"!EventName"` negotiations. Further experimentation is encouraged).
-
 WorldGuard is open source and is available under the GNU Lesser
 General Public License v3.
 
