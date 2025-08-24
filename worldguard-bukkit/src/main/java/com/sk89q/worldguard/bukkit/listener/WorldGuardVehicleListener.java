@@ -46,19 +46,16 @@ public class WorldGuardVehicleListener extends AbstractListener {
 
     @EventHandler
     public void onVehicleMove(VehicleMoveEvent event) {
+        if (getWorldConfig(event.getVehicle().getWorld()).isEventDisabled(event.getEventName())) return;
         Vehicle vehicle = event.getVehicle();
         if (vehicle.getPassengers().isEmpty()) return;
-
         List<Player> playerPassengers = vehicle.getPassengers().stream()
-                .filter(ent -> ent instanceof Player).map(ent -> (Player) ent).toList();
-
+                .filter(ent -> ent instanceof Player).map(ent -> (Player) ent).collect(Collectors.toList());
         if (playerPassengers.isEmpty()) {
             return;
         }
-
         World world = vehicle.getWorld();
         WorldConfiguration wcfg = getWorldConfig(world);
-        if (wcfg.isEventDisabled(event.getEventName())) return;
 
         if (wcfg.useRegions) {
             // Did we move a block?
