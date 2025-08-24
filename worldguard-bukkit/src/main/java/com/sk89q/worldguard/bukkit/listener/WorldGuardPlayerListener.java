@@ -79,13 +79,12 @@ public class WorldGuardPlayerListener extends AbstractListener {
         super(plugin);
     }
 
-
     @EventHandler
     public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
-        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
         Player player = event.getPlayer();
         LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
         WorldConfiguration wcfg = getWorldConfig(player.getWorld());
+        if (wcfg.isEventDisabled(event.getEventName())) return;
         Session session = WorldGuard.getInstance().getPlatform().getSessionManager().getIfPresent(localPlayer);
         if (session != null) {
             GameModeFlag handler = session.getHandler(GameModeFlag.class);
@@ -102,12 +101,12 @@ public class WorldGuardPlayerListener extends AbstractListener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
         Player player = event.getPlayer();
         World world = player.getWorld();
 
         ConfigurationManager cfg = getConfig();
         WorldConfiguration wcfg = getWorldConfig(world);
+        if (wcfg.isEventDisabled(event.getEventName())) return;
 
         if (cfg.activityHaltToggle) {
             player.sendMessage(ChatColor.YELLOW
@@ -140,10 +139,10 @@ public class WorldGuardPlayerListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerChat(AsyncPlayerChatEvent event) {
-        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
         Player player = event.getPlayer();
         LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
         WorldConfiguration wcfg = getWorldConfig(player.getWorld());
+        if (wcfg.isEventDisabled(event.getEventName())) return;
         if (wcfg.useRegions) {
             RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
             ApplicableRegionSet chatFrom = query.getApplicableRegions(localPlayer.getLocation());
@@ -207,9 +206,11 @@ public class WorldGuardPlayerListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
         Player player = event.getPlayer();
         World world = player.getWorld();
+
+        WorldConfiguration wcfg = getWorldConfig(world);
+        if (wcfg.isEventDisabled(event.getEventName())) return;
 
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             handleBlockRightClick(event);
@@ -218,10 +219,8 @@ public class WorldGuardPlayerListener extends AbstractListener {
         }
 
         ConfigurationManager cfg = getConfig();
-        WorldConfiguration wcfg = getWorldConfig(world);
 
-        if (wcfg.removeInfiniteStacks
-                && !getPlugin().hasPermission(player, "worldguard.override.infinite-stack")) {
+        if (wcfg.removeInfiniteStacks && !getPlugin().hasPermission(player, "worldguard.override.infinite-stack")) {
             int slot = player.getInventory().getHeldItemSlot();
             ItemStack heldItem = player.getInventory().getItem(slot);
             if (heldItem != null && heldItem.getAmount() < 0) {
@@ -237,7 +236,6 @@ public class WorldGuardPlayerListener extends AbstractListener {
      * @param event Thrown event
      */
     private void handleBlockRightClick(PlayerInteractEvent event) {
-        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
         if (event.useItemInHand() == Event.Result.DENY) {
             return;
         }
@@ -249,6 +247,7 @@ public class WorldGuardPlayerListener extends AbstractListener {
         @Nullable ItemStack item = event.getItem();
 
         WorldConfiguration wcfg = getWorldConfig(world);
+        if (wcfg.isEventDisabled(event.getEventName())) return;
 
         // Infinite stack removal
         if (Materials.isInventoryBlock(type)
@@ -296,7 +295,6 @@ public class WorldGuardPlayerListener extends AbstractListener {
      * @param event Thrown event
      */
     private void handlePhysicalInteract(PlayerInteractEvent event) {
-        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
         if (event.useInteractedBlock() == Event.Result.DENY) return;
 
         Player player = event.getPlayer();
@@ -305,6 +303,7 @@ public class WorldGuardPlayerListener extends AbstractListener {
         World world = player.getWorld();
 
         WorldConfiguration wcfg = getWorldConfig(world);
+        if (wcfg.isEventDisabled(event.getEventName())) return;
 
         if (type == Material.FARMLAND && wcfg.disablePlayerCropTrampling) {
             event.setCancelled(true);
@@ -322,10 +321,10 @@ public class WorldGuardPlayerListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerRespawn(PlayerRespawnEvent event) {
-        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
         Player player = event.getPlayer();
         if (com.sk89q.worldguard.bukkit.util.Entities.isNPC(player)) return;
         WorldConfiguration wcfg = getWorldConfig(player.getWorld());
+        if (wcfg.isEventDisabled(event.getEventName())) return;
 
         if (wcfg.useRegions) {
             LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
@@ -342,12 +341,11 @@ public class WorldGuardPlayerListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onItemHeldChange(PlayerItemHeldEvent event) {
-        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
         Player player = event.getPlayer();
         WorldConfiguration wcfg = getWorldConfig(player.getWorld());
+        if (wcfg.isEventDisabled(event.getEventName())) return;
 
-        if (wcfg.removeInfiniteStacks
-                && !getPlugin().hasPermission(player, "worldguard.override.infinite-stack")) {
+        if (wcfg.removeInfiniteStacks && !getPlugin().hasPermission(player, "worldguard.override.infinite-stack")) {
             int newSlot = event.getNewSlot();
             ItemStack heldItem = player.getInventory().getItem(newSlot);
             if (heldItem != null && heldItem.getAmount() < 0) {
@@ -359,7 +357,6 @@ public class WorldGuardPlayerListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onPlayerTeleport(PlayerTeleportEvent event) {
-        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
         if (event.getTo() == null) {
             // The target location for PlayerTeleportEvents can be null.
             // Those events will be ignored by the server, so we can ignore them too.
@@ -370,6 +367,7 @@ public class WorldGuardPlayerListener extends AbstractListener {
         LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
         ConfigurationManager cfg = getConfig();
         WorldConfiguration wcfg = getWorldConfig(player.getWorld());
+        if (wcfg.isEventDisabled(event.getEventName())) return;
 
         if (wcfg.useRegions && cfg.usePlayerTeleports) {
             RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
@@ -425,11 +423,11 @@ public class WorldGuardPlayerListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
-        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
         Player player = event.getPlayer();
         LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
         ConfigurationManager cfg = getConfig();
         WorldConfiguration wcfg = getWorldConfig(player.getWorld());
+        if (wcfg.isEventDisabled(event.getEventName())) return;
 
         if (wcfg.useRegions && !WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(localPlayer, localPlayer.getWorld())) {
             ApplicableRegionSet set =

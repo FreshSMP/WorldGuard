@@ -270,4 +270,6 @@ public abstract class WorldConfiguration {
         }
         return max;
     }
+
+    public abstract boolean isEventDisabled(String eventName);
 }

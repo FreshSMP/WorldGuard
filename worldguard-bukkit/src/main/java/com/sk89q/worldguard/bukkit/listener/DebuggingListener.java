@@ -110,7 +110,6 @@ public class DebuggingListener extends AbstractListener {
         builder.append(" ");
         builder.append(": ").append(getEventName(event.getOriginalEvent()));
         if (event.getOriginalEvent() instanceof PlayerInteractEvent) {
-        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
             builder.append(".").append(((PlayerInteractEvent) event.getOriginalEvent()).getAction());
         }
         if (event.getResult() != Result.DEFAULT) {

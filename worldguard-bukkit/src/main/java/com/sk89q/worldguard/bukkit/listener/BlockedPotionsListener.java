@@ -69,10 +69,10 @@ public class BlockedPotionsListener extends AbstractListener {
         return null;
     }
 
-
     @EventHandler
     public void onProjectile(DamageEntityEvent event) {
-        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
+        BukkitWorldConfiguration wcfg = getWorldConfig(event.getWorld());
+        if (wcfg.isEventDisabled(event.getEventName())) return;
         if (!(event.getOriginalEvent() instanceof EntityDamageByEntityEvent originalEvent)) {
             return;
         }
@@ -80,7 +80,6 @@ public class BlockedPotionsListener extends AbstractListener {
             return;
         }
 
-        BukkitWorldConfiguration wcfg = getWorldConfig(event.getWorld());
         PotionEffectType blockedEffect = null;
         if (originalEvent.getDamager() instanceof SpectralArrow) {
             if (wcfg.blockPotions.contains(PotionEffectType.GLOWING)) {
@@ -104,8 +103,8 @@ public class BlockedPotionsListener extends AbstractListener {
 
     @EventHandler
     public void onItemInteract(UseItemEvent event) {
-        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
         BukkitWorldConfiguration wcfg = getWorldConfig(event.getWorld());
+        if (wcfg.isEventDisabled(event.getEventName())) return;
         ItemStack item = event.getItemStack();
 
         if (item.getType() != Material.POTION

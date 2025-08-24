@@ -46,7 +46,6 @@ public class WorldGuardVehicleListener extends AbstractListener {
 
     @EventHandler
     public void onVehicleMove(VehicleMoveEvent event) {
-        if (getWorldConfig(event.getVehicle().getWorld()).isEventDisabled(event.getEventName())) return;
         Vehicle vehicle = event.getVehicle();
         if (vehicle.getPassengers().isEmpty()) return;
 
@@ -60,6 +59,7 @@ public class WorldGuardVehicleListener extends AbstractListener {
 
             World world = vehicle.getWorld();
             WorldConfiguration wcfg = getWorldConfig(world);
+            if (wcfg.isEventDisabled(event.getEventName())) return;
 
             if (wcfg.useRegions) {
                 if (Locations.isDifferentBlock(BukkitAdapter.adapt(event.getFrom()), BukkitAdapter.adapt(event.getTo()))) {

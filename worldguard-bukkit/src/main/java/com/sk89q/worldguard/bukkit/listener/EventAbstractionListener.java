@@ -718,8 +718,8 @@ public class EventAbstractionListener extends AbstractListener {
     //-------------------------------------------------------------------------
 
     public void onBlockFromTo(BlockFromToEvent event) {
-        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         WorldConfiguration config = getWorldConfig(event.getBlock().getWorld());
+        if (config.isEventDisabled(event.getEventName())) return;
 
         // This only applies to regions but nothing else cares about high
         // frequency events at the moment
@@ -761,12 +761,11 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onCreatureSpawn(CreatureSpawnEvent event) {
-        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         switch (event.getSpawnReason()) {
             case DISPENSE_EGG:
             case EGG:
             case SPAWNER_EGG:
-                if (getWorldConfig(event.getEntity().getWorld()).strictEntitySpawn) {
+                if (getWorldConfig(event.getLocation().getWorld()).strictEntitySpawn) {
                     Events.fireToCancel(event, new SpawnEntityEvent(event, Cause.unknown(), event.getEntity()));
                 }
                 break;
@@ -1036,15 +1035,14 @@ public class EventAbstractionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onInventoryOpen(InventoryOpenEvent event) {
-        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
         InventoryHolder holder = PaperLib.getHolder(event.getInventory(), false).getHolder();
         if (holder instanceof Entity && holder == event.getPlayer()) return;
+        if (getWorldConfig(event.getPlayer().getWorld()).isEventDisabled(event.getEventName())) return;
 
         handleInventoryHolderUse(event, create(event.getPlayer()), holder);
     }
 
     public void onInventoryMoveItem(InventoryMoveItemEvent event) {
-        if (getWorldConfig(event.getDestination().getLocation().getWorld()).isEventDisabled(event.getEventName())) return;
         InventoryHolder causeHolder = PaperLib.getHolder(event.getInitiator(), false).getHolder();
 
         WorldConfiguration wcfg = null;
@@ -1055,6 +1053,8 @@ public class EventAbstractionListener extends AbstractListener {
                 && (wcfg = getWorldConfig((((HopperMinecart) causeHolder).getEntity().getWorld()))).ignoreHopperMoveEvents) {
             return;
         }
+
+        if (wcfg != null && wcfg.isEventDisabled(event.getEventName())) return;
 
         Entry entry;
 

@@ -27,8 +27,6 @@ events:
 
 Functionally, you can toggle `whitelist-mode` to disable all events; except those in `events.disabled`.
 
-(This also supports `"!EventName"` negotiations. Further experimentation is encouraged).
-
 WorldGuard is open source and is available under the GNU Lesser
 General Public License v3.
 
