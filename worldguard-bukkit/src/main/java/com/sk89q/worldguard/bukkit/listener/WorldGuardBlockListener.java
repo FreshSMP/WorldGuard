@@ -81,9 +81,9 @@ public class WorldGuardBlockListener extends AbstractListener {
      */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
-        WorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
-        if (wcfg.isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         Player player = event.getPlayer();
+        WorldConfiguration wcfg = getWorldConfig(player.getWorld());
 
         if (!wcfg.itemDurability) {
             ItemStack held = player.getInventory().getItemInMainHand();
@@ -101,8 +101,7 @@ public class WorldGuardBlockListener extends AbstractListener {
      */
     @EventHandler(ignoreCancelled = true)
     public void onBlockFromTo(BlockFromToEvent event) {
-        WorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
-        if (wcfg.isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         World world = event.getBlock().getWorld();
         Block blockFrom = event.getBlock();
         Block blockTo = event.getToBlock();
@@ -118,6 +117,8 @@ public class WorldGuardBlockListener extends AbstractListener {
         boolean isWater = Materials.isWater(fromType);
         boolean isLava = fromType == Material.LAVA;
         boolean isAir = fromType == Material.AIR;
+
+        WorldConfiguration wcfg = getWorldConfig(world);
 
         if (wcfg.simulateSponge && isWater) {
             int ox = blockTo.getX();
@@ -188,9 +189,7 @@ public class WorldGuardBlockListener extends AbstractListener {
      */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockIgnite(BlockIgniteEvent event) {
-        WorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
-        if (wcfg.isEventDisabled(event.getEventName())) return;
-
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         IgniteCause cause = event.getCause();
         Block block = event.getBlock();
         World world = block.getWorld();
@@ -202,6 +201,7 @@ public class WorldGuardBlockListener extends AbstractListener {
             return;
         }
 
+        WorldConfiguration wcfg = getWorldConfig(world);
         boolean isFireSpread = cause == IgniteCause.SPREAD;
 
         if (wcfg.preventLightningFire && cause == IgniteCause.LIGHTNING) {
@@ -282,14 +282,15 @@ public class WorldGuardBlockListener extends AbstractListener {
      */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockBurn(BlockBurnEvent event) {
-        BukkitWorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
-        if (wcfg.isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         ConfigurationManager cfg = getConfig();
 
         if (cfg.activityHaltToggle) {
             event.setCancelled(true);
             return;
         }
+
+        BukkitWorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
 
         if (wcfg.disableFireSpread) {
             event.setCancelled(true);
@@ -352,9 +353,9 @@ public class WorldGuardBlockListener extends AbstractListener {
     /*
      * Called when block physics occurs.
      */
+    @EventHandler(ignoreCancelled = true)
     public void onBlockPhysics(BlockPhysicsEvent event) {
-        WorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
-        if (wcfg.isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         ConfigurationManager cfg = getConfig();
 
         if (cfg.activityHaltToggle) {
@@ -362,6 +363,7 @@ public class WorldGuardBlockListener extends AbstractListener {
             return;
         }
 
+        WorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
         final Material id = event.getBlock().getType();
 
         if (id == Material.GRAVEL && wcfg.noPhysicsGravel) {
@@ -392,10 +394,11 @@ public class WorldGuardBlockListener extends AbstractListener {
      */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent event) {
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         Block target = event.getBlock();
         World world = target.getWorld();
+
         WorldConfiguration wcfg = getWorldConfig(world);
-        if (wcfg.isEventDisabled(event.getEventName())) return;
 
         if (wcfg.simulateSponge && target.getType() == Material.SPONGE) {
             if (wcfg.redstoneSponges && target.isBlockIndirectlyPowered()) {
@@ -413,11 +416,13 @@ public class WorldGuardBlockListener extends AbstractListener {
     /*
      * Called when redstone changes.
      */
+    @EventHandler(priority = EventPriority.HIGH)
     public void onBlockRedstoneChange(BlockRedstoneEvent event) {
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         Block blockTo = event.getBlock();
         World world = blockTo.getWorld();
+
         WorldConfiguration wcfg = getWorldConfig(world);
-        if (wcfg.isEventDisabled(event.getEventName())) return;
 
         if (wcfg.simulateSponge && wcfg.redstoneSponges) {
             int ox = blockTo.getX();
@@ -443,15 +448,17 @@ public class WorldGuardBlockListener extends AbstractListener {
         }
     }
 
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onLeavesDecay(LeavesDecayEvent event) {
-        WorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
-        if (wcfg.isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         ConfigurationManager cfg = getConfig();
 
         if (cfg.activityHaltToggle) {
             event.setCancelled(true);
             return;
         }
+
+        WorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
 
         if (wcfg.disableLeafDecay) {
             event.setCancelled(true);
@@ -470,14 +477,15 @@ public class WorldGuardBlockListener extends AbstractListener {
      */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockForm(BlockFormEvent event) {
-        WorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
-        if (wcfg.isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         ConfigurationManager cfg = getConfig();
 
         if (cfg.activityHaltToggle) {
             event.setCancelled(true);
             return;
         }
+
+        WorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
 
         Material type = event.getNewState().getType();
 
@@ -539,9 +547,9 @@ public class WorldGuardBlockListener extends AbstractListener {
     /*
      * Called when a block spreads based on world conditions.
      */
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockSpread(BlockSpreadEvent event) {
-        WorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
-        if (wcfg.isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         ConfigurationManager cfg = getConfig();
 
         if (cfg.activityHaltToggle) {
@@ -549,6 +557,7 @@ public class WorldGuardBlockListener extends AbstractListener {
             return;
         }
 
+        WorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
         Material newType = event.getNewState().getType(); // craftbukkit randomly gives AIR as event.getSource even if that block is not air
 
         if (Materials.isMushroom(newType)) {
@@ -627,20 +636,20 @@ public class WorldGuardBlockListener extends AbstractListener {
             }
         }
 
-        handleGrow(wcfg, event, event.getBlock().getLocation(), newType);
+        handleGrow(event, event.getBlock().getLocation(), newType);
     }
 
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockGrow(BlockGrowEvent event) {
-        WorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
-        if (wcfg.isEventDisabled(event.getEventName())) return;
-
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         Location loc = event.getBlock().getLocation();
         final Material type = event.getNewState().getType();
 
-        handleGrow(wcfg, event, loc, type);
+        handleGrow(event, loc, type);
     }
 
-    private void handleGrow(WorldConfiguration wcfg, Cancellable event, Location loc, Material type) {
+    private void handleGrow(Cancellable event, Location loc, Material type) {
+        WorldConfiguration wcfg = getWorldConfig(loc.getWorld());
         if (Materials.isCrop(type)) {
             if (wcfg.disableCropGrowth) {
                 event.setCancelled(true);
@@ -658,9 +667,11 @@ public class WorldGuardBlockListener extends AbstractListener {
     /*
      * Called when a block fades.
      */
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockFade(BlockFadeEvent event) {
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
+
         WorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
-        if (wcfg.isEventDisabled(event.getEventName())) return;
 
         if (event.getBlock().getType() == Material.ICE) {
             if (wcfg.disableIceMelting) {
@@ -715,8 +726,7 @@ public class WorldGuardBlockListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockExplode(BlockExplodeEvent event) {
-        WorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
-        if (wcfg.isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         ConfigurationManager cfg = getConfig();
 
         if (cfg.activityHaltToggle) {
@@ -724,6 +734,7 @@ public class WorldGuardBlockListener extends AbstractListener {
             return;
         }
 
+        WorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
         if (wcfg.blockOtherExplosions) {
             event.setCancelled(true);
         }
@@ -732,9 +743,10 @@ public class WorldGuardBlockListener extends AbstractListener {
     /**
      * Called when the moisture level of a block changes
      */
+    @EventHandler(ignoreCancelled = true)
     public void onMoistureChange(MoistureChangeEvent event) {
+        if (getWorldConfig(event.getBlock().getWorld()).isEventDisabled(event.getEventName())) return;
         WorldConfiguration wcfg = getWorldConfig(event.getBlock().getWorld());
-        if (wcfg.isEventDisabled(event.getEventName())) return;
 
         if (wcfg.disableSoilMoistureChange) {
             event.setCancelled(true);

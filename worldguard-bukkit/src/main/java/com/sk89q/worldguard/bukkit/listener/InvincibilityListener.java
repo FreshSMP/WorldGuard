@@ -23,7 +23,6 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.util.Entities;
-import com.sk89q.worldguard.config.WorldConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -58,8 +57,7 @@ public class InvincibilityListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityDamage(EntityDamageEvent event) {
-        WorldConfiguration wcfg = getWorldConfig(event.getEntity().getWorld());
-        if (wcfg.isEventDisabled(event.getEventName())) return;
+        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         Entity victim = event.getEntity();
         if (Entities.isNPC(victim)) return;
 
@@ -70,14 +68,15 @@ public class InvincibilityListener extends AbstractListener {
                 player.setFireTicks(0);
                 event.setCancelled(true);
 
-                if (event instanceof EntityDamageByEntityEvent byEntityEvent) {
+                if (event instanceof EntityDamageByEntityEvent) {
+                    EntityDamageByEntityEvent byEntityEvent = (EntityDamageByEntityEvent) event;
                     Entity attacker = byEntityEvent.getDamager();
 
                     if (attacker instanceof Projectile && ((Projectile) attacker).getShooter() instanceof Entity) {
                         attacker = (Entity) ((Projectile) attacker).getShooter();
                     }
 
-                    if (wcfg.regionInvinciblityRemovesMobs
+                    if (getWorldConfig(player.getWorld()).regionInvinciblityRemovesMobs
                             && attacker instanceof LivingEntity && !(attacker instanceof Player)
                             && !(attacker instanceof Tameable && ((Tameable) attacker).isTamed())) {
                         attacker.remove();
@@ -89,8 +88,8 @@ public class InvincibilityListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityCombust(EntityCombustEvent event) {
-        Entity entity = event.getEntity();
         if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
+        Entity entity = event.getEntity();
         if (Entities.isNPC(entity)) return;
 
         if (entity instanceof Player player) {

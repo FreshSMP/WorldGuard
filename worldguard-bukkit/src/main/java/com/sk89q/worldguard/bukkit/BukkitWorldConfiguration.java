@@ -297,7 +297,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         disableCopperBlockFade = getBoolean("dynamics.disable-copper-block-fade", false);
         allowedSnowFallOver = new HashSet<>(convertLegacyBlocks(getStringList("dynamics.snow-fall-blocks", null)));
 
-        worldEventChecker = new WorldEventChecker(Set.copyOf(getStringList("events.disabled", null)), getBoolean("events.whitelist-mode", false));
+        worldEventChecker = new WorldEventChecker(new HashSet<>(getStringList("events.disabled", null)), getBoolean("events.whitelist-mode", false));
 
         useRegions = getBoolean("regions.enable", true);
         regionInvinciblityRemovesMobs = getBoolean("regions.invincibility-removes-mobs", false);

@@ -28,7 +28,6 @@ import com.sk89q.worldguard.bukkit.event.entity.DestroyEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.SpawnEntityEvent;
 import com.sk89q.worldguard.bukkit.event.entity.UseEntityEvent;
 import com.sk89q.worldguard.bukkit.event.inventory.UseItemEvent;
-import com.sk89q.worldguard.config.WorldConfiguration;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -51,8 +50,8 @@ public class BuildPermissionListener extends AbstractListener {
         return getPlugin().hasPermission(sender, "worldguard.build." + perm);
     }
 
-    private void tellErrorMessage(CommandSender sender, WorldConfiguration wcfg) {
-        String message = wcfg.buildPermissionDenyMessage;
+    private void tellErrorMessage(CommandSender sender, World world) {
+        String message = getWorldConfig(world).buildPermissionDenyMessage;
         if (!message.isEmpty()) {
             sender.sendMessage(message);
         }
@@ -60,9 +59,8 @@ public class BuildPermissionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlaceBlock(final PlaceBlockEvent event) {
-        WorldConfiguration wcfg = getWorldConfig(event.getWorld());
-        if (wcfg.isEventDisabled(event.getEventName())) return;
-        if (!wcfg.buildPermissions) return;
+        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
+        if (!getWorldConfig(event.getWorld()).buildPermissions) return;
 
         Object rootCause = event.getCause().getRootCause();
 
@@ -72,7 +70,7 @@ public class BuildPermissionListener extends AbstractListener {
 
             if (!hasBuildPermission(player, "block." + material.name().toLowerCase() + ".place")
                     && !hasBuildPermission(player, "block.place." + material.name().toLowerCase())) {
-                tellErrorMessage(player, wcfg);
+                tellErrorMessage(player, event.getWorld());
                 event.setCancelled(true);
             }
         }
@@ -80,9 +78,8 @@ public class BuildPermissionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBreakBlock(final BreakBlockEvent event) {
-        WorldConfiguration wcfg = getWorldConfig(event.getWorld());
-        if (wcfg.isEventDisabled(event.getEventName())) return;
-        if (!wcfg.buildPermissions) return;
+        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
+        if (!getWorldConfig(event.getWorld()).buildPermissions) return;
 
         Object rootCause = event.getCause().getRootCause();
 
@@ -92,7 +89,7 @@ public class BuildPermissionListener extends AbstractListener {
 
             if (!hasBuildPermission(player, "block." + material.name().toLowerCase() + ".remove")
                     && !hasBuildPermission(player, "block.remove." + material.name().toLowerCase())) {
-                tellErrorMessage(player, wcfg);
+                tellErrorMessage(player, event.getWorld());
                 event.setCancelled(true);
             }
         }
@@ -100,9 +97,8 @@ public class BuildPermissionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onUseBlock(final UseBlockEvent event) {
-        WorldConfiguration wcfg = getWorldConfig(event.getWorld());
-        if (wcfg.isEventDisabled(event.getEventName())) return;
-        if (!wcfg.buildPermissions) return;
+        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
+        if (!getWorldConfig(event.getWorld()).buildPermissions) return;
 
         Object rootCause = event.getCause().getRootCause();
 
@@ -115,16 +111,15 @@ public class BuildPermissionListener extends AbstractListener {
                         hasBuildPermission(player, "block.interact." + blacklistName);
             }, true);
             if (blocked && !event.isSilent()) {
-                tellErrorMessage(player, wcfg);
+                tellErrorMessage(player, event.getWorld());
             }
         }
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onSpawnEntity(SpawnEntityEvent event) {
-        WorldConfiguration wcfg = getWorldConfig(event.getWorld());
-        if (wcfg.isEventDisabled(event.getEventName())) return;
-        if (!wcfg.buildPermissions) return;
+        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
+        if (!getWorldConfig(event.getWorld()).buildPermissions) return;
 
         Object rootCause = event.getCause().getRootCause();
 
@@ -134,7 +129,7 @@ public class BuildPermissionListener extends AbstractListener {
 
             if (!hasBuildPermission(player, "entity." + type.name().toLowerCase() + ".place")
                     && !hasBuildPermission(player, "entity.place." + type.name().toLowerCase())) {
-                tellErrorMessage(player, wcfg);
+                tellErrorMessage(player, event.getWorld());
                 event.setCancelled(true);
             }
         }
@@ -142,9 +137,8 @@ public class BuildPermissionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onDestroyEntity(DestroyEntityEvent event) {
-        WorldConfiguration wcfg = getWorldConfig(event.getWorld());
-        if (wcfg.isEventDisabled(event.getEventName())) return;
-        if (!wcfg.buildPermissions) return;
+        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
+        if (!getWorldConfig(event.getWorld()).buildPermissions) return;
 
         Object rootCause = event.getCause().getRootCause();
 
@@ -154,7 +148,7 @@ public class BuildPermissionListener extends AbstractListener {
 
             if (!hasBuildPermission(player, "entity." + type.name().toLowerCase() + ".remove")
                     && !hasBuildPermission(player, "entity.remove." + type.name().toLowerCase())) {
-                tellErrorMessage(player, wcfg);
+                tellErrorMessage(player, event.getWorld());
                 event.setCancelled(true);
             }
         }
@@ -162,9 +156,8 @@ public class BuildPermissionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onUseEntity(UseEntityEvent event) {
-        WorldConfiguration wcfg = getWorldConfig(event.getWorld());
-        if (wcfg.isEventDisabled(event.getEventName())) return;
-        if (!wcfg.buildPermissions) return;
+        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
+        if (!getWorldConfig(event.getWorld()).buildPermissions) return;
 
         Object rootCause = event.getCause().getRootCause();
 
@@ -174,7 +167,7 @@ public class BuildPermissionListener extends AbstractListener {
 
             if (!hasBuildPermission(player, "entity." + type.name().toLowerCase() + ".interact")
                     && !hasBuildPermission(player, "entity.interact." + type.name().toLowerCase())) {
-                tellErrorMessage(player, wcfg);
+                tellErrorMessage(player, event.getWorld());
                 event.setCancelled(true);
             }
         }
@@ -182,9 +175,8 @@ public class BuildPermissionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onDamageEntity(DamageEntityEvent event) {
-        WorldConfiguration wcfg = getWorldConfig(event.getWorld());
-        if (wcfg.isEventDisabled(event.getEventName())) return;
-        if (!wcfg.buildPermissions) return;
+        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
+        if (!getWorldConfig(event.getWorld()).buildPermissions) return;
 
         Object rootCause = event.getCause().getRootCause();
 
@@ -194,7 +186,7 @@ public class BuildPermissionListener extends AbstractListener {
 
             if (!hasBuildPermission(player, "entity." + type.name().toLowerCase() + ".damage")
                     && !hasBuildPermission(player, "entity.damage." + type.name().toLowerCase())) {
-                tellErrorMessage(player, wcfg);
+                tellErrorMessage(player, event.getWorld());
                 event.setCancelled(true);
             }
         }
@@ -202,9 +194,8 @@ public class BuildPermissionListener extends AbstractListener {
 
     @EventHandler(ignoreCancelled = true)
     public void onUseItem(UseItemEvent event) {
-        WorldConfiguration wcfg = getWorldConfig(event.getWorld());
-        if (wcfg.isEventDisabled(event.getEventName())) return;
-        if (!wcfg.buildPermissions) return;
+        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
+        if (!getWorldConfig(event.getWorld()).buildPermissions) return;
 
         Object rootCause = event.getCause().getRootCause();
 
@@ -218,7 +209,7 @@ public class BuildPermissionListener extends AbstractListener {
 
             if (!hasBuildPermission(player, "item." + material.name().toLowerCase() + ".use")
                     && !hasBuildPermission(player, "item.use." + material.name().toLowerCase())) {
-                tellErrorMessage(player, wcfg);
+                tellErrorMessage(player, event.getWorld());
                 event.setCancelled(true);
             }
         }
