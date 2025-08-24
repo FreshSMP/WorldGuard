@@ -59,7 +59,6 @@ public class RegionFlagsListener extends AbstractListener {
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onPlaceBlock(final PlaceBlockEvent event) {
         if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
-        if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
 
         RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
 
@@ -81,10 +80,10 @@ public class RegionFlagsListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onBreakBlock(final BreakBlockEvent event) {
-        if (getWorldConfig(event.getWorld()).isEventDisabled(event.getEventName())) return;
-        if (!isRegionSupportEnabled(event.getWorld())) return; // Region support disabled
-
         WorldConfiguration config = getWorldConfig(event.getWorld());
+        if (config.useRegions) return; // Region support disabled
+        if (config.isEventDisabled(event.getEventName())) return;
+
         RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
 
         Block block;
@@ -117,10 +116,11 @@ public class RegionFlagsListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onEntityDamage(EntityDamageEvent event) {
-        if (getWorldConfig(event.getEntity().getWorld()).isEventDisabled(event.getEventName())) return;
         Entity entity = event.getEntity();
         World world = entity.getWorld();
-        if (!isRegionSupportEnabled(world)) return; // Region support disabled
+        WorldConfiguration config = getWorldConfig(world);
+        if (config.useRegions) return; // Region support disabled
+        if (config.isEventDisabled(event.getEventName())) return;
 
         if (Entities.isNPC(entity)) return;
         if (!(entity instanceof Player player)) return;

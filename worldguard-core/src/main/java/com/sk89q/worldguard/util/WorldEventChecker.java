@@ -59,20 +59,7 @@ public record WorldEventChecker(Set<String> events, boolean whitelistMode) {
     }
 
     public boolean isEventDisabled(String eventName) {
-        if (eventName == null) {
-            return whitelistMode;
-        }
-
-        if (events.isEmpty() && whitelistMode) {
-            return true;
-        }
-
-        if (events.contains("!" + eventName)) {
-            return whitelistMode;
-        }
-
         boolean isListed = events.contains(eventName);
-
         return whitelistMode != isListed;
     }
 }
