@@ -29,16 +29,8 @@ import java.io.File;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class BukkitConfigurationManager extends YamlConfigurationManager {
-
-    /**
-     * Serialize ONLY YAML mutations/saves across all worlds to prevent
-     * SnakeYAML from iterating while another thread mutates.
-     * (Targeted: we do NOT lock reads or event logic.)
-     */
-    public static final ReentrantLock YAML_WRITE_LOCK = new ReentrantLock();
 
     @Unreported private WorldGuardPlugin plugin;
     @Unreported private ConcurrentMap<String, BukkitWorldConfiguration> worlds = new ConcurrentHashMap<>();
@@ -88,13 +80,7 @@ public class BukkitConfigurationManager extends YamlConfigurationManager {
         for (World world : WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getWorlds()) {
             get(world);
         }
-
-        YAML_WRITE_LOCK.lock();
-        try {
-            getConfig().save();
-        } finally {
-            YAML_WRITE_LOCK.unlock();
-        }
+        getConfig().save();
     }
 
     /**

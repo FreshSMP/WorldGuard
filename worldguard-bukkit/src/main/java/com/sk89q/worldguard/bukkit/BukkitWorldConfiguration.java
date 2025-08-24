@@ -105,12 +105,7 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         List<String> inputs = parentConfig.getStringList(node, null);
 
         if (inputs == null || inputs.isEmpty()) {
-            BukkitConfigurationManager.YAML_WRITE_LOCK.lock();
-            try {
-                parentConfig.setProperty(node, new ArrayList<String>());
-            } finally {
-                BukkitConfigurationManager.YAML_WRITE_LOCK.unlock();
-            }
+            parentConfig.setProperty(node, new ArrayList<String>());
         }
 
         if (config.getProperty(node) != null) {
@@ -137,7 +132,6 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
      */
     @Override
     public void loadConfiguration() {
-        BukkitConfigurationManager.YAML_WRITE_LOCK.lock();
         try {
             config.load();
         } catch (IOException e) {
@@ -145,8 +139,6 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
         } catch (YAMLException e) {
             log.severe("Error parsing configuration for world " + worldName + ". ");
             throw e;
-        } finally {
-            BukkitConfigurationManager.YAML_WRITE_LOCK.unlock();
         }
 
         boolean needParentSave = false;
@@ -430,33 +422,23 @@ public class BukkitWorldConfiguration extends YamlWorldConfiguration {
             }
         }
 
-        BukkitConfigurationManager.YAML_WRITE_LOCK.lock();
-        try {
-            config.setHeader(CONFIG_HEADER);
-            config.save();
-            if (needParentSave) {
-                parentConfig.save();
-            }
-        } finally {
-            BukkitConfigurationManager.YAML_WRITE_LOCK.unlock();
+        config.setHeader(CONFIG_HEADER);
+
+        config.save();
+        if (needParentSave) {
+            parentConfig.save();
         }
     }
 
     private boolean removeProperty(String prop) {
-        boolean parentMutated = false;
-        BukkitConfigurationManager.YAML_WRITE_LOCK.lock();
-        try {
-            if (config.getProperty(prop) != null) {
-                config.removeProperty(prop);
-            }
-            if (parentConfig.getProperty(prop) != null) {
-                parentConfig.removeProperty(prop);
-                parentMutated = true;
-            }
-        } finally {
-            BukkitConfigurationManager.YAML_WRITE_LOCK.unlock();
+        if (config.getProperty(prop) != null) {
+            config.removeProperty(prop);
         }
-        return parentMutated;
+        if (parentConfig.getProperty(prop) != null) {
+            parentConfig.removeProperty(prop);
+            return true;
+        }
+        return false;
     }
 
     public boolean isChestProtected(Location block, LocalPlayer player) {
