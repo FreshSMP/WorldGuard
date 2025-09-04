@@ -398,7 +398,7 @@ public class WorldGuardPlayerListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onChorusTeleport(PlayerTeleportEvent event) {
-        if (event.getCause() != TeleportCause.CHORUS_FRUIT) return;
+        if (event.getCause() != TeleportCause.CONSUMABLE_EFFECT) return;
 
         Player player = event.getPlayer();
         if (com.sk89q.worldguard.bukkit.util.Entities.isNPC(player)) return;

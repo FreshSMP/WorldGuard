@@ -49,7 +49,7 @@ public class WorldGuardVehicleListener extends AbstractListener {
         Vehicle vehicle = event.getVehicle();
         if (vehicle.getPassengers().isEmpty()) return;
         List<Player> playerPassengers = vehicle.getPassengers().stream()
-                .filter(ent -> ent instanceof Player).map(ent -> (Player) ent).collect(Collectors.toList());
+                .filter(ent -> ent instanceof Player).map(ent -> (Player) ent).toList();
         if (playerPassengers.isEmpty()) {
             return;
         }
