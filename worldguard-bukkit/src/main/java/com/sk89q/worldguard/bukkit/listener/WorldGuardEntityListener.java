@@ -355,7 +355,6 @@ public class WorldGuardEntityListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityDamage(EntityDamageEvent event) {
-
         if (event instanceof EntityDamageByEntityEvent) {
             this.onEntityDamageByEntity((EntityDamageByEntityEvent) event);
             return;
@@ -372,8 +371,8 @@ public class WorldGuardEntityListener extends AbstractListener {
         if (defender instanceof Wolf && ((Wolf) defender).isTamed()) {
             if (wcfg.antiWolfDumbness) {
                 event.setCancelled(true);
-                return;
             }
+
         } else if (defender instanceof Player player && !Entities.isNPC(defender)) {
             LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
 
@@ -436,7 +435,6 @@ public class WorldGuardEntityListener extends AbstractListener {
 
             if (wcfg.disableSuffocationDamage && type == DamageCause.SUFFOCATION) {
                 event.setCancelled(true);
-                return;
             }
         }
     }
@@ -450,12 +448,14 @@ public class WorldGuardEntityListener extends AbstractListener {
         Entity ent = event.getEntity();
 
         if (cfg.activityHaltToggle) {
-            ent.remove();
+            if (ent != null) ent.remove();
             event.setCancelled(true);
             return;
         }
 
         BukkitWorldConfiguration wcfg = getWorldConfig(event.getLocation().getWorld());
+
+        // --- Creeper ---
         if (ent instanceof Creeper) {
             if (wcfg.blockCreeperExplosions) {
                 event.setCancelled(true);
@@ -465,12 +465,26 @@ public class WorldGuardEntityListener extends AbstractListener {
                 event.blockList().clear();
                 return;
             }
-        } else if (ent instanceof EnderDragon) {
+            if (wcfg.useRegions) {
+                event.blockList().removeIf(block ->
+                        !WorldGuard.getInstance().getPlatform().getRegionContainer()
+                                .createQuery()
+                                .testState(BukkitAdapter.adapt(block.getLocation()), null, Flags.CREEPER_EXPLOSION));
+            }
+            return;
+        }
+
+        // --- Ender Dragon ---
+        if (ent instanceof EnderDragon) {
             if (wcfg.blockEnderDragonBlockDamage) {
                 event.blockList().clear();
                 return;
             }
-        } else if (ent instanceof TNTPrimed || ent instanceof ExplosiveMinecart) {
+            return;
+        }
+
+        // --- TNT & Minecart ---
+        if (ent instanceof TNTPrimed || ent instanceof ExplosiveMinecart) {
             if (wcfg.blockTNTExplosions) {
                 event.setCancelled(true);
                 return;
@@ -479,7 +493,17 @@ public class WorldGuardEntityListener extends AbstractListener {
                 event.blockList().clear();
                 return;
             }
-        } else if (ent instanceof Fireball) {
+            if (wcfg.useRegions) {
+                event.blockList().removeIf(block ->
+                        !WorldGuard.getInstance().getPlatform().getRegionContainer()
+                                .createQuery()
+                                .testState(BukkitAdapter.adapt(block.getLocation()), null, Flags.TNT));
+            }
+            return;
+        }
+
+        // --- Fireballs / Wither Skulls / Wind Charge ---
+        if (ent instanceof Fireball) {
             if (ent instanceof WitherSkull) {
                 if (wcfg.blockWitherSkullExplosions) {
                     event.setCancelled(true);
@@ -505,16 +529,16 @@ public class WorldGuardEntityListener extends AbstractListener {
                 }
             }
             if (wcfg.useRegions && !(ent instanceof WindCharge)) {
-                for (Block block : event.blockList()) {
-                    if (!WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
-                            .testState(BukkitAdapter.adapt(block.getLocation()), null, Entities.getExplosionFlag(ent))) {
-                        event.blockList().clear();
-                        if (wcfg.explosionFlagCancellation) event.setCancelled(true);
-                        return;
-                    }
-                }
+                event.blockList().removeIf(block ->
+                        !WorldGuard.getInstance().getPlatform().getRegionContainer()
+                                .createQuery()
+                                .testState(BukkitAdapter.adapt(block.getLocation()), null, Entities.getExplosionFlag(ent)));
             }
-        } else if (ent instanceof Wither) {
+            return;
+        }
+
+        // --- Wither ---
+        if (ent instanceof Wither) {
             if (wcfg.blockWitherExplosions) {
                 event.setCancelled(true);
                 return;
@@ -524,43 +548,33 @@ public class WorldGuardEntityListener extends AbstractListener {
                 return;
             }
             if (wcfg.useRegions) {
-                for (Block block : event.blockList()) {
-                    if (!WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
-                            .testState(BukkitAdapter.adapt(block.getLocation()), null, Flags.WITHER_DAMAGE)) {
-                        event.blockList().clear();
-                        event.setCancelled(true);
-                        return;
-                    }
-                }
+                event.blockList().removeIf(block ->
+                        !WorldGuard.getInstance().getPlatform().getRegionContainer()
+                                .createQuery()
+                                .testState(BukkitAdapter.adapt(block.getLocation()), null, Flags.WITHER_DAMAGE));
             }
-        } else {
-            // unhandled entity
-            if (wcfg.blockOtherExplosions) {
-                event.setCancelled(true);
-                return;
-            }
-            if (wcfg.useRegions) {
-                for (Block block : event.blockList()) {
-                    if (!WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
-                            .testState(BukkitAdapter.adapt(block.getLocation()), null, Flags.OTHER_EXPLOSION)) {
-                        event.blockList().clear();
-                        if (wcfg.explosionFlagCancellation) event.setCancelled(true);
-                        return;
-                    }
-                }
-            }
+            return;
         }
 
+        // --- Other explosions ---
+        if (wcfg.blockOtherExplosions) {
+            event.setCancelled(true);
+            return;
+        }
+        if (wcfg.useRegions) {
+            event.blockList().removeIf(block ->
+                    !WorldGuard.getInstance().getPlatform().getRegionContainer()
+                            .createQuery()
+                            .testState(BukkitAdapter.adapt(block.getLocation()), null, Flags.OTHER_EXPLOSION));
+        }
+
+        // --- Chest protection ---
         if (wcfg.signChestProtection) {
-            for (Block block : event.blockList()) {
-                if (wcfg.isChestProtected(BukkitAdapter.adapt(block.getLocation()))) {
-                    event.blockList().clear();
-                    return;
-                }
-            }
+            event.blockList().removeIf(block ->
+                    wcfg.isChestProtected(BukkitAdapter.adapt(block.getLocation())));
         }
-
     }
+
 
     /*
      * Called on explosion prime
