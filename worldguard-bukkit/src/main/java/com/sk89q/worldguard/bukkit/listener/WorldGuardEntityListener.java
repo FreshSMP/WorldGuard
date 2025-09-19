@@ -439,7 +439,7 @@ public class WorldGuardEntityListener extends AbstractListener {
         Entity ent = event.getEntity();
 
         if (cfg.activityHaltToggle) {
-            if (ent != null) ent.remove();
+            ent.remove();
             event.setCancelled(true);
             return;
         }
@@ -458,9 +458,9 @@ public class WorldGuardEntityListener extends AbstractListener {
             }
             if (wcfg.useRegions) {
                 event.blockList().removeIf(block ->
-                        !WorldGuard.getInstance().getPlatform().getRegionContainer()
-                                .createQuery()
-                                .testState(BukkitAdapter.adapt(block.getLocation()), null, Flags.CREEPER_EXPLOSION));
+                    !WorldGuard.getInstance().getPlatform().getRegionContainer()
+                        .createQuery()
+                        .testState(BukkitAdapter.adapt(block.getLocation()), null, Flags.CREEPER_EXPLOSION));
             }
             return;
         }
@@ -486,14 +486,13 @@ public class WorldGuardEntityListener extends AbstractListener {
             }
             if (wcfg.useRegions) {
                 event.blockList().removeIf(block ->
-                        !WorldGuard.getInstance().getPlatform().getRegionContainer()
-                                .createQuery()
-                                .testState(BukkitAdapter.adapt(block.getLocation()), null, Flags.TNT));
+                    !WorldGuard.getInstance().getPlatform().getRegionContainer()
+                            .createQuery()
+                            .testState(BukkitAdapter.adapt(block.getLocation()), null, Flags.TNT));
             }
             return;
         }
 
-        // --- Fireballs / Wither Skulls / Wind Charge ---
         if (ent instanceof Fireball) {
             if (ent instanceof WitherSkull) {
                 if (wcfg.blockWitherSkullExplosions) {
@@ -521,14 +520,13 @@ public class WorldGuardEntityListener extends AbstractListener {
             }
             if (wcfg.useRegions && !(ent instanceof WindCharge)) {
                 event.blockList().removeIf(block ->
-                        !WorldGuard.getInstance().getPlatform().getRegionContainer()
-                                .createQuery()
-                                .testState(BukkitAdapter.adapt(block.getLocation()), null, Entities.getExplosionFlag(ent)));
+                    !WorldGuard.getInstance().getPlatform().getRegionContainer()
+                        .createQuery()
+                        .testState(BukkitAdapter.adapt(block.getLocation()), null, Entities.getExplosionFlag(ent)));
             }
             return;
         }
 
-        // --- Wither ---
         if (ent instanceof Wither) {
             if (wcfg.blockWitherExplosions) {
                 event.setCancelled(true);
@@ -540,32 +538,29 @@ public class WorldGuardEntityListener extends AbstractListener {
             }
             if (wcfg.useRegions) {
                 event.blockList().removeIf(block ->
-                        !WorldGuard.getInstance().getPlatform().getRegionContainer()
-                                .createQuery()
-                                .testState(BukkitAdapter.adapt(block.getLocation()), null, Flags.WITHER_DAMAGE));
+                    !WorldGuard.getInstance().getPlatform().getRegionContainer()
+                        .createQuery()
+                        .testState(BukkitAdapter.adapt(block.getLocation()), null, Flags.WITHER_DAMAGE));
             }
             return;
         }
 
-        // --- Other explosions ---
         if (wcfg.blockOtherExplosions) {
             event.setCancelled(true);
             return;
         }
         if (wcfg.useRegions) {
             event.blockList().removeIf(block ->
-                    !WorldGuard.getInstance().getPlatform().getRegionContainer()
-                            .createQuery()
-                            .testState(BukkitAdapter.adapt(block.getLocation()), null, Flags.OTHER_EXPLOSION));
+                !WorldGuard.getInstance().getPlatform().getRegionContainer()
+                    .createQuery()
+                    .testState(BukkitAdapter.adapt(block.getLocation()), null, Flags.OTHER_EXPLOSION));
         }
 
-        // --- Chest protection ---
         if (wcfg.signChestProtection) {
             event.blockList().removeIf(block ->
                     wcfg.isChestProtected(BukkitAdapter.adapt(block.getLocation())));
         }
     }
-
 
     /*
      * Called on explosion prime
