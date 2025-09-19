@@ -124,7 +124,6 @@ public class WorldGuardEntityListener extends AbstractListener {
         }
         if (block.getType() == Material.SNIFFER_EGG && wcfg.disableCreatureSnifferEggTrampling) {
             event.setCancelled(true);
-            return;
         }
     }
 
@@ -146,7 +145,6 @@ public class WorldGuardEntityListener extends AbstractListener {
         if (defender instanceof Wolf && ((Wolf) defender).isTamed()) {
             if (wcfg.antiWolfDumbness && !(type == DamageCause.VOID)) {
                 event.setCancelled(true);
-                return;
             }
         } else if (defender instanceof Player player && !Entities.isNPC(defender)) {
             LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
@@ -182,7 +180,6 @@ public class WorldGuardEntityListener extends AbstractListener {
                                 && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
                     .queryState(localPlayer.getLocation(), (RegionAssociable) null, Flags.OTHER_EXPLOSION))))) {
                 event.setCancelled(true);
-                return;
             }
         } else {
 
@@ -194,8 +191,6 @@ public class WorldGuardEntityListener extends AbstractListener {
                                 && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
                     .queryState(BukkitAdapter.adapt(defender.getLocation()), (RegionAssociable) null, Flags.OTHER_EXPLOSION))))) {
                 event.setCancelled(true);
-                return;
-
             }
         }
     }
@@ -278,7 +273,6 @@ public class WorldGuardEntityListener extends AbstractListener {
 
                         if (!set.testState(localPlayer, Flags.MOB_DAMAGE) && !(attacker instanceof Tameable)) {
                             event.setCancelled(true);
-                            return;
                         }
                     }
                 }
@@ -299,7 +293,6 @@ public class WorldGuardEntityListener extends AbstractListener {
         WorldConfiguration wcfg = getWorldConfig(defender.getWorld());
         if (defender instanceof Player player && !Entities.isNPC(defender)) {
             LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
-
 
             // Check Mob
             if (!(attacker instanceof Player)) {
@@ -334,7 +327,6 @@ public class WorldGuardEntityListener extends AbstractListener {
                         RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
                         if (!query.testState(localPlayer.getLocation(), localPlayer, Entities.getExplosionFlag(event.getDamager())) && wcfg.explosionFlagCancellation) {
                             event.setCancelled(true);
-                            return;
                         }
 
                     }
@@ -343,7 +335,6 @@ public class WorldGuardEntityListener extends AbstractListener {
         } else if (defender instanceof ItemFrame) {
             if (checkItemFrameProtection(attacker, (ItemFrame) defender)) {
                 event.setCancelled(true);
-                return;
             }
         } else if (defender instanceof ArmorStand && Entities.isNonPlayerCreature(attacker)) {
             if (wcfg.blockEntityArmorStandDestroy) {
@@ -372,7 +363,6 @@ public class WorldGuardEntityListener extends AbstractListener {
         if (defender instanceof Wolf && ((Wolf) defender).isTamed()) {
             if (wcfg.antiWolfDumbness) {
                 event.setCancelled(true);
-                return;
             }
         } else if (defender instanceof Player player && !Entities.isNPC(defender)) {
             LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
@@ -436,7 +426,6 @@ public class WorldGuardEntityListener extends AbstractListener {
 
             if (wcfg.disableSuffocationDamage && type == DamageCause.SUFFOCATION) {
                 event.setCancelled(true);
-                return;
             }
         }
     }
@@ -580,33 +569,27 @@ public class WorldGuardEntityListener extends AbstractListener {
         if (event.getEntityType() == EntityType.WITHER) {
             if (wcfg.blockWitherExplosions) {
                 event.setCancelled(true);
-                return;
             }
         } else if (event.getEntityType() == EntityType.WITHER_SKULL) {
             if (wcfg.blockWitherSkullExplosions) {
                 event.setCancelled(true);
-                return;
             }
         } else if (event.getEntityType() == EntityType.FIREBALL) {
             if (wcfg.blockFireballExplosions) {
                 event.setCancelled(true);
-                return;
             }
         } else if (event.getEntityType() == EntityType.CREEPER) {
             if (wcfg.blockCreeperExplosions) {
                 event.setCancelled(true);
-                return;
             }
         } else if (event.getEntityType() == EntityType.TNT
                 || event.getEntityType() == EntityType.TNT_MINECART) {
             if (wcfg.blockTNTExplosions) {
                 event.setCancelled(true);
-                return;
             }
         } else if (event.getEntity() instanceof AbstractWindCharge) {
             if (wcfg.blockWindChargeExplosions) {
                 event.setCancelled(true);
-                return;
             }
         }
     }
@@ -669,7 +652,6 @@ public class WorldGuardEntityListener extends AbstractListener {
                 && eventLoc.getY() >= 60
                 && event.getSpawnReason() == SpawnReason.NATURAL) {
             event.setCancelled(true);
-            return;
         }
     }
 
@@ -822,12 +804,10 @@ public class WorldGuardEntityListener extends AbstractListener {
 
             if ((id == Material.SAND || id == Material.RED_SAND) && wcfg.noPhysicsSand) {
                 event.setCancelled(true);
-                return;
             }
         } else if (ent instanceof Enderman) {
             if (wcfg.disableEndermanGriefing) {
                 event.setCancelled(true);
-                return;
             }
         } else if (ent.getType() == EntityType.WITHER) {
             if (wcfg.blockWitherBlockDamage || wcfg.blockWitherExplosions) {
@@ -838,13 +818,11 @@ public class WorldGuardEntityListener extends AbstractListener {
                 Location location = event.getBlock().getLocation();
                 if (!StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().queryState(BukkitAdapter.adapt(location), (RegionAssociable) null, Flags.WITHER_DAMAGE))) {
                     event.setCancelled(true);
-                    return;
                 }
             }
-        } else if (/*ent instanceof Zombie && */event instanceof EntityBreakDoorEvent) {
+        } else if (event instanceof EntityBreakDoorEvent) {
             if (wcfg.blockZombieDoorDestruction) {
                 event.setCancelled(true);
-                return;
             }
         }
     }
@@ -876,10 +854,7 @@ public class WorldGuardEntityListener extends AbstractListener {
                 }
             }
         }
-        if (wcfg.blockEntityItemFrameDestroy && !(attacker instanceof Player)) {
-            return true;
-        }
-        return false;
+        return wcfg.blockEntityItemFrameDestroy && !(attacker instanceof Player);
     }
 
 }
