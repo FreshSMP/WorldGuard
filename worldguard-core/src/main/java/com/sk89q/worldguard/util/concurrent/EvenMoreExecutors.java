@@ -64,11 +64,8 @@ public final class EvenMoreExecutors {
                 minThreads, maxThreads,
                 60L, TimeUnit.SECONDS,
                 new LinkedBlockingDeque<>(queueSize),
-                threadFormat != null
-                    ? new ThreadFactoryBuilder().setNameFormat(threadFormat).build()
-                    : Executors.defaultThreadFactory(),
-                new ThreadPoolExecutor.CallerRunsPolicy()
-        );
+                threadFormat != null ? new ThreadFactoryBuilder().setNameFormat(threadFormat).build()
+                        : Executors.defaultThreadFactory(), new ThreadPoolExecutor.DiscardOldestPolicy());
         threadPoolExecutor.allowCoreThreadTimeOut(true);
         return threadPoolExecutor;
     }
