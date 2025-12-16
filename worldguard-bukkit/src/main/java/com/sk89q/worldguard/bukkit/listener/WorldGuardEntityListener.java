@@ -485,10 +485,18 @@ public class WorldGuardEntityListener extends AbstractListener {
                 return;
             }
             if (wcfg.useRegions) {
-                event.blockList().removeIf(block ->
-                    !WorldGuard.getInstance().getPlatform().getRegionContainer()
-                            .createQuery()
-                            .testState(BukkitAdapter.adapt(block.getLocation()), null, Flags.TNT));
+                RegionQuery query = WorldGuard.getInstance()
+                        .getPlatform()
+                        .getRegionContainer()
+                        .createQuery();
+
+                event.blockList().removeIf(block -> {
+                    ApplicableRegionSet regions = query.getApplicableRegions(
+                            BukkitAdapter.adapt(block.getLocation())
+                    );
+
+                    return regions.size() > 0 && !regions.testState(null, Flags.TNT);
+                });
             }
             return;
         }
