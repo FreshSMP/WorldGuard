@@ -231,7 +231,7 @@ public final class RegionManager {
     }
 
     /**
-     * Aad a region to the manager.
+     * Add a region to the manager.
      *
      * <p>The parents of the region will also be added to the index.</p>
      *
