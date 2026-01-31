@@ -129,12 +129,12 @@ public class BukkitPlayer extends com.sk89q.worldedit.bukkit.BukkitPlayer implem
 
     @Override
     public void setPlayerWeather(WeatherType weather) {
-        getPlayer().setPlayerWeather(weather == WeatherTypes.CLEAR ? org.bukkit.WeatherType.CLEAR : org.bukkit.WeatherType.DOWNFALL);
+        getPlayer().getScheduler().run(plugin, task -> getPlayer().setPlayerWeather(weather == WeatherTypes.CLEAR ? org.bukkit.WeatherType.CLEAR : org.bukkit.WeatherType.DOWNFALL), null);
     }
 
     @Override
     public void resetPlayerWeather() {
-        getPlayer().resetPlayerWeather();
+        getPlayer().getScheduler().run(plugin, task -> getPlayer().resetPlayerWeather(), null);
     }
 
     @Override
@@ -149,12 +149,12 @@ public class BukkitPlayer extends com.sk89q.worldedit.bukkit.BukkitPlayer implem
 
     @Override
     public void setPlayerTime(long time, boolean relative) {
-        getPlayer().setPlayerTime(time, relative);
+        getPlayer().getScheduler().run(plugin, task -> getPlayer().setPlayerTime(time, relative), null);
     }
 
     @Override
     public void resetPlayerTime() {
-        getPlayer().resetPlayerTime();
+        getPlayer().getScheduler().run(plugin, task -> getPlayer().resetPlayerTime(), null);
     }
 
     @Override
