@@ -129,12 +129,20 @@ public class BukkitPlayer extends com.sk89q.worldedit.bukkit.BukkitPlayer implem
 
     @Override
     public void setPlayerWeather(WeatherType weather) {
-        getPlayer().getScheduler().run(plugin, task -> getPlayer().setPlayerWeather(weather == WeatherTypes.CLEAR ? org.bukkit.WeatherType.CLEAR : org.bukkit.WeatherType.DOWNFALL), null);
+        if (plugin.isEnabled()) {
+            getPlayer().getScheduler().run(plugin, task -> getPlayer().setPlayerWeather(weather == WeatherTypes.CLEAR ? org.bukkit.WeatherType.CLEAR : org.bukkit.WeatherType.DOWNFALL), null);
+        } else {
+            getPlayer().setPlayerWeather(weather == WeatherTypes.CLEAR ? org.bukkit.WeatherType.CLEAR : org.bukkit.WeatherType.DOWNFALL);
+        }
     }
 
     @Override
     public void resetPlayerWeather() {
-        getPlayer().getScheduler().run(plugin, task -> getPlayer().resetPlayerWeather(), null);
+        if (plugin.isEnabled()) {
+            getPlayer().getScheduler().run(plugin, task -> getPlayer().resetPlayerWeather(), null);
+        } else {
+            getPlayer().resetPlayerWeather();
+        }
     }
 
     @Override
@@ -149,12 +157,20 @@ public class BukkitPlayer extends com.sk89q.worldedit.bukkit.BukkitPlayer implem
 
     @Override
     public void setPlayerTime(long time, boolean relative) {
-        getPlayer().getScheduler().run(plugin, task -> getPlayer().setPlayerTime(time, relative), null);
+        if (plugin.isEnabled()) {
+            getPlayer().getScheduler().run(plugin, task -> getPlayer().setPlayerTime(time, relative), null);
+        } else {
+            getPlayer().setPlayerTime(time, relative);
+        }
     }
 
     @Override
     public void resetPlayerTime() {
-        getPlayer().getScheduler().run(plugin, task -> getPlayer().resetPlayerTime(), null);
+        if (plugin.isEnabled()) {
+            getPlayer().getScheduler().run(plugin, task -> getPlayer().resetPlayerTime(), null);
+        } else {
+            getPlayer().resetPlayerTime();
+        }
     }
 
     @Override
