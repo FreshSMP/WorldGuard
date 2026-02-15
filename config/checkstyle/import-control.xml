@@ -27,6 +27,7 @@
       <allow pkg="org.bukkit"/>
       <allow pkg="org.bstats.bukkit"/>
       <allow pkg="org.bstats.charts"/>
+      <allow pkg="io.canvasmc"/>
       <allow pkg="io.papermc.lib"/>
       <allow pkg="com.destroystokyo.paper"/>
       <allow pkg="io.papermc.paper"/>

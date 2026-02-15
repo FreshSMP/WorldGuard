@@ -14,6 +14,10 @@ repositories {
         name = "EngineHub"
         url = uri("https://maven.enginehub.org/repo/")
     }
+    maven {
+        name = "CanvasMC"
+        url = uri("https://maven.canvasmc.io/snapshots")
+    }
     mavenCentral()
     afterEvaluate {
         killNonEngineHubRepositories()

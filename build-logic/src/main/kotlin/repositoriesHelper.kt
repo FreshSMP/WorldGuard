@@ -7,6 +7,7 @@ import org.gradle.api.logging.Logging
 // clearly even better, so we allow those as well. We also allow Gradle's plugin repository.
 private val ALLOWED_PREFIXES = listOf(
     "https://maven.enginehub.org",
+    "https://maven.canvasmc.io",
     "https://repo.maven.apache.org/maven2/",
     "https://s01.oss.sonatype.org/content/repositories/snapshots/",
     "https://plugins.gradle.org",

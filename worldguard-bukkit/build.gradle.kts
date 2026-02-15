@@ -16,7 +16,7 @@ dependencies {
     "testCompileOnly"(libs.jetbrains.annotations) {
         because("Resolving Spigot annotations")
     }
-    "compileOnly"(libs.paperApi) {
+    "compileOnly"(libs.canvasApi) {
         exclude("org.slf4j", "slf4j-api")
         exclude("junit", "junit")
     }
