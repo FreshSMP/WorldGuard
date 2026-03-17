@@ -111,9 +111,13 @@ public class PlayerMoveListener extends AbstractListener implements Runnable {
             override.setPitch(to.getPitch());
             override.setYaw(to.getYaw());
 
-            Bukkit.getScheduler().runTask(getPlugin(), () -> player.teleportAsync(override.clone()));
+            if (getPlugin().isFolia()) {
+                player.teleportAsync(override.clone());
+            } else {
+                Bukkit.getScheduler().runTask(getPlugin(), () -> player.teleportAsync(override.clone()));
+            }
 
-            Bukkit.getScheduler().runTask(getPlugin(), () -> {
+            if (getPlugin().isFolia()) {
                 Entity vehicle = player.getVehicle();
                 if (vehicle != null) {
                     vehicle.eject();
@@ -133,13 +137,39 @@ public class PlayerMoveListener extends AbstractListener implements Runnable {
 
                     player.teleportAsync(override.clone().add(0, 1, 0));
                 }
-            });
+            } else {
+                Bukkit.getScheduler().runTask(getPlugin(), () -> {
+                    Entity vehicle = player.getVehicle();
+                    if (vehicle != null) {
+                        vehicle.eject();
 
-                Bukkit.getScheduler().runTask(getPlugin(), () -> player.teleportAsync(override.clone().add(0, 1, 0)));
+                        Entity current = vehicle;
+                        while (current != null) {
+                            current.eject();
+                            vehicle.setVelocity(new Vector(0, 0, 0));
 
-                        Bukkit.getScheduler().runTaskLater(getPlugin(), () -> player.teleportAsync(override.clone().add(0, 1, 0)), 1);
+                            if (vehicle instanceof LivingEntity) {
+                                vehicle.teleportAsync(override.clone());
+                            } else {
+                                vehicle.teleportAsync(override.clone().add(0, 1, 0));
+                            }
+                            current = current.getVehicle();
+                        }
+
+                        player.teleportAsync(override.clone().add(0, 1, 0));
                     }
+                });
+            }
+
+                Location delayedDismountLocation = override.clone().add(0, 1, 0);
+                if (getPlugin().isFolia()) {
+                    player.getScheduler().runDelayed(getPlugin(), scheduledTask -> player.teleportAsync(delayedDismountLocation),
+                        null, 1);
+                } else {
+                    Bukkit.getScheduler().runTaskLater(getPlugin(), () -> player.teleportAsync(delayedDismountLocation), 1);
                 }
+            }
+        }
 
             lastPlayerLocations.put(player.getUniqueId(), to);
         });

@@ -49,6 +49,9 @@ public class WorldGuardVehicleListener extends AbstractListener {
         Vehicle vehicle = event.getVehicle();
         if (vehicle.getPassengers().isEmpty()) return;
 
+        org.bukkit.Location from = event.getFrom();
+        org.bukkit.Location to = event.getTo();
+
         Bukkit.getScheduler().runTaskAsynchronously(getPlugin(), () -> {
             List<Player> playerPassengers = vehicle.getPassengers().stream()
                     .filter(ent -> ent instanceof Player).map(ent -> (Player) ent).toList();
@@ -62,24 +65,34 @@ public class WorldGuardVehicleListener extends AbstractListener {
             if (wcfg.isEventDisabled(event.getEventName())) return;
 
             if (wcfg.useRegions) {
-                if (Locations.isDifferentBlock(BukkitAdapter.adapt(event.getFrom()), BukkitAdapter.adapt(event.getTo()))) {
+                if (Locations.isDifferentBlock(BukkitAdapter.adapt(from), BukkitAdapter.adapt(to))) {
                     for (Player player : playerPassengers) {
                         if (Entities.isNPC(player)) continue;
                         LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
 
                         Location lastValid = WorldGuard.getInstance().getPlatform().getSessionManager()
-                                .get(localPlayer).testMoveTo(localPlayer, BukkitAdapter.adapt(event.getTo()), MoveType.RIDE);
+                                .get(localPlayer).testMoveTo(localPlayer, BukkitAdapter.adapt(to), MoveType.RIDE);
 
                         if (lastValid != null) {
-                            Bukkit.getScheduler().runTask(getPlugin(), () -> {
+                            if (getPlugin().isFolia()) {
                                 vehicle.setVelocity(new Vector(0, 0, 0));
-                                vehicle.teleportAsync(event.getFrom());
+                                vehicle.teleportAsync(from);
 
-                                if (Locations.isDifferentBlock(lastValid, BukkitAdapter.adapt(event.getFrom()))) {
+                                if (Locations.isDifferentBlock(lastValid, BukkitAdapter.adapt(from))) {
                                     Vector dir = player.getLocation().getDirection();
                                     player.teleportAsync(BukkitAdapter.adapt(lastValid).setDirection(dir));
                                 }
-                            });
+                            } else {
+                                Bukkit.getScheduler().runTask(getPlugin(), () -> {
+                                    vehicle.setVelocity(new Vector(0, 0, 0));
+                                    vehicle.teleportAsync(from);
+
+                                    if (Locations.isDifferentBlock(lastValid, BukkitAdapter.adapt(from))) {
+                                        Vector dir = player.getLocation().getDirection();
+                                        player.teleportAsync(BukkitAdapter.adapt(lastValid).setDirection(dir));
+                                    }
+                                });
+                            }
                             return;
                         }
                     }
