@@ -48,36 +48,64 @@ public class BukkitSessionManager extends AbstractSessionManager implements Runn
     @Override
     public void resetAllStates() {
         Collection<? extends Player> players = Bukkit.getServer().getOnlinePlayers();
-        Bukkit.getScheduler().runTaskAsynchronously(WorldGuardPlugin.inst(), () -> {
+        if (WorldGuardPlugin.inst().isFolia()) {
             for (Player player : players) {
-                BukkitPlayer bukkitPlayer = new BukkitPlayer(WorldGuardPlugin.inst(), player);
-                Session session = getIfPresent(bukkitPlayer);
-                if (session != null) {
-                    Bukkit.getScheduler().runTaskAsynchronously(WorldGuardPlugin.inst(), () -> session.resetState(bukkitPlayer));
-                }
+                player.getScheduler().run(WorldGuardPlugin.inst(), (scheduledTask) -> {
+                    BukkitPlayer bukkitPlayer = new BukkitPlayer(WorldGuardPlugin.inst(), player);
+                    Session session = getIfPresent(bukkitPlayer);
+                    if (session != null) {
+                        session.resetState(bukkitPlayer);
+                    }
+                }, null);
             }
-        });
+        } else {
+            Bukkit.getScheduler().runTaskAsynchronously(WorldGuardPlugin.inst(), () -> {
+                for (Player player : players) {
+                    BukkitPlayer bukkitPlayer = new BukkitPlayer(WorldGuardPlugin.inst(), player);
+                    Session session = getIfPresent(bukkitPlayer);
+                    if (session != null) {
+                        Bukkit.getScheduler().runTaskAsynchronously(WorldGuardPlugin.inst(), () -> session.resetState(bukkitPlayer));
+                    }
+                }
+            });
+        }
     }
 
     @EventHandler
     public void onPlayerProcess(ProcessPlayerEvent event) {
-        // Preload a session asynchronously
-        Bukkit.getScheduler().runTaskAsynchronously(WorldGuardPlugin.inst(), () -> {
-            LocalPlayer player = WorldGuardPlugin.inst().wrapPlayer(event.getPlayer());
-            get(player).initialize(player);
-        });
+        // Preload a session
+        if (WorldGuardPlugin.inst().isFolia()) {
+            event.getPlayer().getScheduler().run(WorldGuardPlugin.inst(), (scheduledTask) -> {
+                LocalPlayer player = WorldGuardPlugin.inst().wrapPlayer(event.getPlayer());
+                get(player).initialize(player);
+            }, null);
+        } else {
+            Bukkit.getScheduler().runTaskAsynchronously(WorldGuardPlugin.inst(), () -> {
+                LocalPlayer player = WorldGuardPlugin.inst().wrapPlayer(event.getPlayer());
+                get(player).initialize(player);
+            });
+        }
     }
 
     @Override
     public void run() {
-        Bukkit.getScheduler().runTaskAsynchronously(WorldGuardPlugin.inst(), () -> {
+        if (WorldGuardPlugin.inst().isFolia()) {
             for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-                LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
-                Session session = get(localPlayer);
-
-                Bukkit.getScheduler().runTaskAsynchronously(WorldGuardPlugin.inst(), () -> session.tick(localPlayer));
+                player.getScheduler().run(WorldGuardPlugin.inst(), (scheduledTask) -> {
+                    LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
+                    get(localPlayer).tick(localPlayer);
+                }, null);
             }
-        });
+        } else {
+            Bukkit.getScheduler().runTaskAsynchronously(WorldGuardPlugin.inst(), () -> {
+                for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                    LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
+                    Session session = get(localPlayer);
+
+                    Bukkit.getScheduler().runTaskAsynchronously(WorldGuardPlugin.inst(), () -> session.tick(localPlayer));
+                }
+            });
+        }
     }
 
     @Override
@@ -96,16 +124,26 @@ public class BukkitSessionManager extends AbstractSessionManager implements Runn
 
     public void shutdown() {
         if (WorldGuardPlugin.inst().isEnabled()) {
-            Bukkit.getScheduler().runTaskAsynchronously(WorldGuardPlugin.inst(), () -> {
+            if (WorldGuardPlugin.inst().isFolia()) {
                 for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-                    LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
-                    Session session = get(localPlayer);
-
-                    if (WorldGuardPlugin.inst().isEnabled()) {
-                        Bukkit.getScheduler().runTaskAsynchronously(WorldGuardPlugin.inst(), () -> session.uninitialize(localPlayer));
-                    }
+                    player.getScheduler().run(WorldGuardPlugin.inst(), (scheduledTask) -> {
+                        LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
+                        Session session = get(localPlayer);
+                        session.uninitialize(localPlayer);
+                    }, null);
                 }
-            });
+            } else {
+                Bukkit.getScheduler().runTaskAsynchronously(WorldGuardPlugin.inst(), () -> {
+                    for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                        LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
+                        Session session = get(localPlayer);
+
+                        if (WorldGuardPlugin.inst().isEnabled()) {
+                            Bukkit.getScheduler().runTaskAsynchronously(WorldGuardPlugin.inst(), () -> session.uninitialize(localPlayer));
+                        }
+                    }
+                });
+            }
         }
     }
 }

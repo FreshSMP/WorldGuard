@@ -102,7 +102,11 @@ public class BukkitRegionContainer extends RegionContainer {
             }
         }, plugin);
 
-        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, cache::invalidateAll, CACHE_INVALIDATION_INTERVAL, CACHE_INVALIDATION_INTERVAL);
+        if (WorldGuardPlugin.inst().isFolia()) {
+            Bukkit.getGlobalRegionScheduler().runAtFixedRate(plugin, scheduledTask -> cache.invalidateAll(), CACHE_INVALIDATION_INTERVAL, CACHE_INVALIDATION_INTERVAL);
+        } else {
+            Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, cache::invalidateAll, CACHE_INVALIDATION_INTERVAL, CACHE_INVALIDATION_INTERVAL);
+        }
     }
 
     public void shutdown() {
