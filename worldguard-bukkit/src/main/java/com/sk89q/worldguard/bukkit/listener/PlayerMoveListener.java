@@ -23,6 +23,7 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.bukkit.util.PaperInterop;
 import com.sk89q.worldguard.session.MoveType;
 import com.sk89q.worldguard.session.Session;
 import org.bukkit.Location;
@@ -117,16 +118,18 @@ public class PlayerMoveListener extends AbstractListener {
                     current.eject();
                     vehicle.setVelocity(new Vector());
                     if (vehicle instanceof LivingEntity) {
-                        vehicle.teleportAsync(override.clone());
+                        PaperInterop.teleportAsync(vehicle, override.clone());
                     } else {
-                        vehicle.teleportAsync(override.clone().add(0, 1, 0));
+                        PaperInterop.teleportAsync(vehicle, override.clone().add(0, 1, 0));
                     }
                     current = current.getVehicle();
                 }
 
-                player.teleportAsync(override.clone().add(0, 1, 0));
+                PaperInterop.teleportAsync(player, override.clone().add(0, 1, 0));
 
-                player.getScheduler().runDelayed(getPlugin(), scheduledTask -> player.teleportAsync(override.clone().add(0, 1, 0)), null, 1);
+                Location delayedDismountLocation = override.clone().add(0, 1, 0);
+                player.getScheduler().runDelayed(getPlugin(),
+                        scheduledTask -> PaperInterop.teleportAsync(player, delayedDismountLocation), null, 1);
             }
         }
     }
@@ -138,9 +141,9 @@ public class PlayerMoveListener extends AbstractListener {
 
         Session session = WorldGuard.getInstance().getPlatform().getSessionManager().get(localPlayer);
         com.sk89q.worldedit.util.Location loc = session.testMoveTo(localPlayer,
-            BukkitAdapter.adapt(event.getPlayer().getLocation()), MoveType.OTHER_CANCELLABLE); // white lie
+                BukkitAdapter.adapt(event.getPlayer().getLocation()), MoveType.OTHER_CANCELLABLE); // white lie
         if (loc != null) {
-            player.teleportAsync(BukkitAdapter.adapt(loc));
+            PaperInterop.teleportAsync(player, BukkitAdapter.adapt(loc));
         }
 
         session.uninitialize(localPlayer);

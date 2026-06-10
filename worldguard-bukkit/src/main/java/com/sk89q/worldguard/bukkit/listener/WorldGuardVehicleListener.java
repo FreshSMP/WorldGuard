@@ -25,6 +25,7 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.bukkit.util.Entities;
+import com.sk89q.worldguard.bukkit.util.PaperInterop;
 import com.sk89q.worldguard.config.WorldConfiguration;
 import com.sk89q.worldguard.session.MoveType;
 import com.sk89q.worldguard.util.Locations;
@@ -36,7 +37,6 @@ import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.util.Vector;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class WorldGuardVehicleListener extends AbstractListener {
 
@@ -66,10 +66,10 @@ public class WorldGuardVehicleListener extends AbstractListener {
                     if ((lastValid = WorldGuard.getInstance().getPlatform().getSessionManager().get(localPlayer)
                             .testMoveTo(localPlayer, BukkitAdapter.adapt(event.getTo()), MoveType.RIDE)) != null) {
                         vehicle.setVelocity(new Vector(0, 0, 0));
-                        vehicle.teleportAsync(event.getFrom());
+                        PaperInterop.teleportAsync(vehicle, event.getFrom());
                         if (Locations.isDifferentBlock(lastValid, BukkitAdapter.adapt(event.getFrom()))) {
                             Vector dir = player.getLocation().getDirection();
-                            player.teleportAsync(BukkitAdapter.adapt(lastValid).setDirection(dir));
+                            PaperInterop.teleportAsync(player, BukkitAdapter.adapt(lastValid).setDirection(dir));
                         }
                         return;
                     }

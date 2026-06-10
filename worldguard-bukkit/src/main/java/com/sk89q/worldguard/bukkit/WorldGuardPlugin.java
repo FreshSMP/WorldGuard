@@ -33,6 +33,8 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitCommandSender;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
+import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.blacklist.Blacklist;
@@ -74,6 +76,8 @@ import com.sk89q.worldguard.protection.managers.storage.file.DirectoryYamlDriver
 import com.sk89q.worldguard.protection.managers.storage.sql.SQLDriver;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.util.logging.RecordMessagePrefixer;
+import io.papermc.lib.PaperLib;
+import io.papermc.paper.ServerBuildInfo;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.DrilldownPie;
@@ -105,6 +109,7 @@ import java.util.logging.Logger;
  */
 public class WorldGuardPlugin extends JavaPlugin {
 
+    private static final org.apache.logging.log4j.Logger LOGGER = LogManagerCompat.getLogger();
     private static WorldGuardPlugin inst;
     private static BukkitWorldGuardPlatform platform;
     private final CommandsManager<Actor> commands;
@@ -207,12 +212,12 @@ public class WorldGuardPlugin extends JavaPlugin {
         }
         worldListener.registerEvents();
 
-            for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-                player.getScheduler().run(this, scheduledTask -> {
-                    ProcessPlayerEvent event = new ProcessPlayerEvent(player);
-                    Events.fire(event);
-                }, null);
-            }
+        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+            player.getScheduler().run(this, scheduledTask -> {
+                ProcessPlayerEvent event = new ProcessPlayerEvent(player);
+                Events.fire(event);
+            }, null);
+        }
 
         ((SimpleFlagRegistry) WorldGuard.getInstance().getFlagRegistry()).setInitialized(true);
 
@@ -537,4 +542,23 @@ public class WorldGuardPlugin extends JavaPlugin {
         this.getServer().getAsyncScheduler().cancelTasks(this);
         this.getServer().getGlobalRegionScheduler().cancelTasks(this);
     }
+
+    private final LazyReference<Boolean> folia = LazyReference.from(() -> {
+        try {
+            // Folia is Paper-based, so this is a good first check.
+            if (PaperLib.isPaper()) {
+                return ServerBuildInfo.buildInfo().isBrandCompatible(net.kyori.adventure.key.Key.key("papermc", "folia"));
+            }
+        } catch (Throwable t) {
+            // Ignore, this likely means an outdated version.
+            LOGGER.warn("Failed to check if server is running Folia", t);
+        }
+
+        return false;
+    });
+
+    public boolean isFolia() {
+        return folia.getValue();
+    }
+
 }

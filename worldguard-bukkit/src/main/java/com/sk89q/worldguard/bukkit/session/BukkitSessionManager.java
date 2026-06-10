@@ -33,8 +33,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-import java.util.Collection;
-
 /**
  * Keeps tracks of sessions and also does session-related handling
  * (flags, etc.).
@@ -47,8 +45,7 @@ public class BukkitSessionManager extends AbstractSessionManager implements Runn
      */
     @Override
     public void resetAllStates() {
-        Collection<? extends Player> players = Bukkit.getServer().getOnlinePlayers();
-        for (Player player : players) {
+        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
             player.getScheduler().run(WorldGuardPlugin.inst(), scheduledTask -> {
                 BukkitPlayer bukkitPlayer = new BukkitPlayer(WorldGuardPlugin.inst(), player);
                 Session session = getIfPresent(bukkitPlayer);
@@ -61,7 +58,7 @@ public class BukkitSessionManager extends AbstractSessionManager implements Runn
 
     @EventHandler
     public void onPlayerProcess(ProcessPlayerEvent event) {
-        // Preload a session
+        // Pre-load a session
         LocalPlayer player = WorldGuardPlugin.inst().wrapPlayer(event.getPlayer());
         get(player).initialize(player);
     }
