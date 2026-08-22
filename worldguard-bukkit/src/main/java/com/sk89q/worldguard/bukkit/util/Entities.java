@@ -30,22 +30,20 @@ import org.bukkit.entity.Creature;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EnderCrystal;
 import org.bukkit.entity.EnderDragon;
+import org.bukkit.entity.Enemy;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Firework;
-import org.bukkit.entity.Flying;
 import org.bukkit.entity.Hanging;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Minecart;
-import org.bukkit.entity.Monster;
 import org.bukkit.entity.NPC;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
-import org.bukkit.entity.Shulker;
-import org.bukkit.entity.Slime;
 import org.bukkit.entity.SpectralArrow;
 import org.bukkit.entity.Steerable;
+import org.bukkit.entity.SulfurCube;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Tameable;
 import org.bukkit.entity.Vehicle;
@@ -81,7 +79,9 @@ public final class Entities {
      * @return true if TNT based
      */
     public static boolean isTNTBased(Entity entity) {
-        return entity instanceof TNTPrimed || entity instanceof ExplosiveMinecart;
+        return entity instanceof TNTPrimed
+                || entity instanceof ExplosiveMinecart
+                || entity instanceof SulfurCube sulfurCube && sulfurCube.canExplode();
     }
 
     /**
@@ -173,11 +173,7 @@ public final class Entities {
      * @return true if hostile
      */
     public static boolean isHostile(Entity entity) {
-        return entity instanceof Monster
-                || entity instanceof Slime
-                || entity instanceof Flying
-                || entity instanceof EnderDragon
-                || entity instanceof Shulker;
+        return entity instanceof Enemy;
     }
 
     /**
@@ -272,6 +268,7 @@ public final class Entities {
             case Wither wither -> Flags.WITHER_DAMAGE;
             case Creeper creeper -> Flags.CREEPER_EXPLOSION;
             case TNTPrimed tnt -> Flags.TNT;
+            case SulfurCube sulfurCube -> Flags.TNT;
             case ExplosiveMinecart minecart -> Flags.TNT;
             case EnderDragon dragon -> Flags.ENDERDRAGON_BLOCK_DAMAGE;
             case null, default -> Flags.OTHER_EXPLOSION;

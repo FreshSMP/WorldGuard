@@ -19,6 +19,8 @@
 
 package com.sk89q.worldguard.bukkit.listener;
 
+import com.destroystokyo.paper.event.entity.EntityZapEvent;
+import com.destroystokyo.paper.event.entity.PreCreatureSpawnEvent;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.LocalPlayer;
@@ -39,6 +41,7 @@ import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
+import io.papermc.lib.PaperLib;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -59,6 +62,7 @@ import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.SulfurCube;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Tameable;
 import org.bukkit.entity.WindCharge;
@@ -66,8 +70,10 @@ import org.bukkit.entity.Wither;
 import org.bukkit.entity.WitherSkull;
 import org.bukkit.entity.Wolf;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.CreeperPowerEvent;
@@ -90,6 +96,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.world.PortalCreateEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.projectiles.ProjectileSource;
 
 import java.util.Set;
@@ -108,6 +115,18 @@ public class WorldGuardEntityListener extends AbstractListener {
         super(plugin);
     }
 
+    @Override
+    public void registerEvents() {
+        super.registerEvents();
+
+        PluginManager pm = getPlugin().getServer().getPluginManager();
+        if (PaperLib.isPaper()) {
+            pm.registerEvents(new PaperListener(), getPlugin());
+        } else {
+            pm.registerEvents(new SpigotListener(), getPlugin());
+        }
+    }
+
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityInteract(EntityInteractEvent event) {
         Block block = event.getBlock();
@@ -124,6 +143,7 @@ public class WorldGuardEntityListener extends AbstractListener {
         }
         if (block.getType() == Material.SNIFFER_EGG && wcfg.disableCreatureSnifferEggTrampling) {
             event.setCancelled(true);
+            return;
         }
     }
 
@@ -145,6 +165,7 @@ public class WorldGuardEntityListener extends AbstractListener {
         if (defender instanceof Wolf && ((Wolf) defender).isTamed()) {
             if (wcfg.antiWolfDumbness && !(type == DamageCause.VOID)) {
                 event.setCancelled(true);
+                return;
             }
         } else if (defender instanceof Player player && !Entities.isNPC(defender)) {
             LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
@@ -176,10 +197,11 @@ public class WorldGuardEntityListener extends AbstractListener {
 
             if (type == DamageCause.BLOCK_EXPLOSION
                     && (wcfg.disableExplosionDamage || wcfg.blockOtherExplosions
-                            || (wcfg.explosionFlagCancellation
-                                && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
+                    || (wcfg.explosionFlagCancellation
+                    && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
                     .queryState(localPlayer.getLocation(), (RegionAssociable) null, Flags.OTHER_EXPLOSION))))) {
                 event.setCancelled(true);
+                return;
             }
         } else {
 
@@ -187,10 +209,12 @@ public class WorldGuardEntityListener extends AbstractListener {
             // handled anywhere else
             if (type == DamageCause.BLOCK_EXPLOSION
                     && (wcfg.blockOtherExplosions
-                            || ((wcfg.explosionFlagCancellation || Entities.isConsideredBuildingIfUsed(defender))
-                                && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
+                    || ((wcfg.explosionFlagCancellation || Entities.isConsideredBuildingIfUsed(defender))
+                    && !StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery()
                     .queryState(BukkitAdapter.adapt(defender.getLocation()), (RegionAssociable) null, Flags.OTHER_EXPLOSION))))) {
                 event.setCancelled(true);
+                return;
+
             }
         }
     }
@@ -273,6 +297,7 @@ public class WorldGuardEntityListener extends AbstractListener {
 
                         if (!set.testState(localPlayer, Flags.MOB_DAMAGE) && !(attacker instanceof Tameable)) {
                             event.setCancelled(true);
+                            return;
                         }
                     }
                 }
@@ -293,6 +318,7 @@ public class WorldGuardEntityListener extends AbstractListener {
         WorldConfiguration wcfg = getWorldConfig(defender.getWorld());
         if (defender instanceof Player player && !Entities.isNPC(defender)) {
             LocalPlayer localPlayer = getPlugin().wrapPlayer(player);
+
 
             // Check Mob
             if (!(attacker instanceof Player)) {
@@ -327,6 +353,7 @@ public class WorldGuardEntityListener extends AbstractListener {
                         RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
                         if (!query.testState(localPlayer.getLocation(), localPlayer, Entities.getExplosionFlag(event.getDamager())) && wcfg.explosionFlagCancellation) {
                             event.setCancelled(true);
+                            return;
                         }
 
                     }
@@ -335,6 +362,7 @@ public class WorldGuardEntityListener extends AbstractListener {
         } else if (defender instanceof ItemFrame) {
             if (checkItemFrameProtection(attacker, (ItemFrame) defender)) {
                 event.setCancelled(true);
+                return;
             }
         } else if (defender instanceof ArmorStand && Entities.isNonPlayerCreature(attacker)) {
             if (wcfg.blockEntityArmorStandDestroy) {
@@ -346,6 +374,7 @@ public class WorldGuardEntityListener extends AbstractListener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityDamage(EntityDamageEvent event) {
+
         if (event instanceof EntityDamageByEntityEvent) {
             this.onEntityDamageByEntity((EntityDamageByEntityEvent) event);
             return;
@@ -362,8 +391,8 @@ public class WorldGuardEntityListener extends AbstractListener {
         if (defender instanceof Wolf && ((Wolf) defender).isTamed()) {
             if (wcfg.antiWolfDumbness) {
                 event.setCancelled(true);
+                return;
             }
-
         } else if (defender instanceof Player player && !Entities.isNPC(defender)) {
             LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
 
@@ -426,6 +455,7 @@ public class WorldGuardEntityListener extends AbstractListener {
 
             if (wcfg.disableSuffocationDamage && type == DamageCause.SUFFOCATION) {
                 event.setCancelled(true);
+                return;
             }
         }
     }
@@ -458,9 +488,9 @@ public class WorldGuardEntityListener extends AbstractListener {
             }
             if (wcfg.useRegions) {
                 event.blockList().removeIf(block ->
-                    !WorldGuard.getInstance().getPlatform().getRegionContainer()
-                        .createQuery()
-                        .testState(BukkitAdapter.adapt(block.getLocation()), null, Flags.CREEPER_EXPLOSION));
+                        !WorldGuard.getInstance().getPlatform().getRegionContainer()
+                                .createQuery()
+                                .testState(BukkitAdapter.adapt(block.getLocation()), null, Flags.CREEPER_EXPLOSION));
             }
             return;
         }
@@ -475,7 +505,7 @@ public class WorldGuardEntityListener extends AbstractListener {
         }
 
         // --- TNT & Minecart ---
-        if (ent instanceof TNTPrimed || ent instanceof ExplosiveMinecart) {
+        if (ent instanceof TNTPrimed || ent instanceof ExplosiveMinecart || ent instanceof SulfurCube) {
             if (wcfg.blockTNTExplosions) {
                 event.setCancelled(true);
                 return;
@@ -528,9 +558,9 @@ public class WorldGuardEntityListener extends AbstractListener {
             }
             if (wcfg.useRegions && !(ent instanceof WindCharge)) {
                 event.blockList().removeIf(block ->
-                    !WorldGuard.getInstance().getPlatform().getRegionContainer()
-                        .createQuery()
-                        .testState(BukkitAdapter.adapt(block.getLocation()), null, Entities.getExplosionFlag(ent)));
+                        !WorldGuard.getInstance().getPlatform().getRegionContainer()
+                                .createQuery()
+                                .testState(BukkitAdapter.adapt(block.getLocation()), null, Entities.getExplosionFlag(ent)));
             }
             return;
         }
@@ -546,9 +576,9 @@ public class WorldGuardEntityListener extends AbstractListener {
             }
             if (wcfg.useRegions) {
                 event.blockList().removeIf(block ->
-                    !WorldGuard.getInstance().getPlatform().getRegionContainer()
-                        .createQuery()
-                        .testState(BukkitAdapter.adapt(block.getLocation()), null, Flags.WITHER_DAMAGE));
+                        !WorldGuard.getInstance().getPlatform().getRegionContainer()
+                                .createQuery()
+                                .testState(BukkitAdapter.adapt(block.getLocation()), null, Flags.WITHER_DAMAGE));
             }
             return;
         }
@@ -559,9 +589,9 @@ public class WorldGuardEntityListener extends AbstractListener {
         }
         if (wcfg.useRegions) {
             event.blockList().removeIf(block ->
-                !WorldGuard.getInstance().getPlatform().getRegionContainer()
-                    .createQuery()
-                    .testState(BukkitAdapter.adapt(block.getLocation()), null, Flags.OTHER_EXPLOSION));
+                    !WorldGuard.getInstance().getPlatform().getRegionContainer()
+                            .createQuery()
+                            .testState(BukkitAdapter.adapt(block.getLocation()), null, Flags.OTHER_EXPLOSION));
         }
 
         if (wcfg.signChestProtection) {
@@ -588,27 +618,34 @@ public class WorldGuardEntityListener extends AbstractListener {
         if (event.getEntityType() == EntityType.WITHER) {
             if (wcfg.blockWitherExplosions) {
                 event.setCancelled(true);
+                return;
             }
         } else if (event.getEntityType() == EntityType.WITHER_SKULL) {
             if (wcfg.blockWitherSkullExplosions) {
                 event.setCancelled(true);
+                return;
             }
         } else if (event.getEntityType() == EntityType.FIREBALL) {
             if (wcfg.blockFireballExplosions) {
                 event.setCancelled(true);
+                return;
             }
         } else if (event.getEntityType() == EntityType.CREEPER) {
             if (wcfg.blockCreeperExplosions) {
                 event.setCancelled(true);
+                return;
             }
         } else if (event.getEntityType() == EntityType.TNT
-                || event.getEntityType() == EntityType.TNT_MINECART) {
+                || event.getEntityType() == EntityType.TNT_MINECART
+                || event.getEntityType() == EntityType.SULFUR_CUBE) {
             if (wcfg.blockTNTExplosions) {
                 event.setCancelled(true);
+                return;
             }
         } else if (event.getEntity() instanceof AbstractWindCharge) {
             if (wcfg.blockWindChargeExplosions) {
                 event.setCancelled(true);
+                return;
             }
         }
     }
@@ -640,8 +677,11 @@ public class WorldGuardEntityListener extends AbstractListener {
             return;
         }
 
-        EntityType entityType = event.getEntityType();
+        handleCreatureSpawn(event, event.getLocation(), event.getEntityType(), event.getSpawnReason(), cfg, wcfg);
+    }
 
+    private static void handleCreatureSpawn(Cancellable event, Location location, EntityType entityType, SpawnReason spawnReason,
+                                            ConfigurationManager cfg, WorldConfiguration wcfg) {
         com.sk89q.worldedit.world.entity.EntityType weEntityType = BukkitAdapter.adapt(entityType);
 
         if (weEntityType != null && wcfg.blockCreatureSpawn.contains(weEntityType)) {
@@ -649,11 +689,9 @@ public class WorldGuardEntityListener extends AbstractListener {
             return;
         }
 
-        Location eventLoc = event.getLocation();
-
         if (wcfg.useRegions && cfg.useRegionsCreatureSpawnEvent) {
             ApplicableRegionSet set =
-                    WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(BukkitAdapter.adapt(eventLoc));
+                    WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().getApplicableRegions(BukkitAdapter.adapt(location));
 
             if (!set.testState(null, Flags.MOB_SPAWNING)) {
                 event.setCancelled(true);
@@ -668,9 +706,10 @@ public class WorldGuardEntityListener extends AbstractListener {
         }
 
         if (wcfg.blockGroundSlimes && entityType == EntityType.SLIME
-                && eventLoc.getY() >= 60
-                && event.getSpawnReason() == SpawnReason.NATURAL) {
+                && location.getY() >= 60
+                && spawnReason == SpawnReason.NATURAL) {
             event.setCancelled(true);
+            return;
         }
     }
 
@@ -693,7 +732,8 @@ public class WorldGuardEntityListener extends AbstractListener {
                     return;
                 }
             }
-            final RegionManager regionManager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(world);
+            final RegionManager regionManager = WorldGuard.getInstance().getPlatform().getRegionContainer()
+                    .get(world);
             ApplicableRegionSet regions;
             if (regionManager == null) {
                 regions = FailedLoadRegionSet.getInstance();
@@ -741,9 +781,7 @@ public class WorldGuardEntityListener extends AbstractListener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onPigZap(PigZapEvent event) {
-        final Entity entity = event.getEntity();
+    private static void handlePigZap(Entity entity, Cancellable event) {
         WorldConfiguration wcfg = getWorldConfig(entity.getWorld());
 
         if (wcfg.disablePigZap) {
@@ -778,9 +816,9 @@ public class WorldGuardEntityListener extends AbstractListener {
         }
         if (wcfg.useRegions && ent instanceof Player player && !Entities.isNPC(ent)
                 && !WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().testState(
-                        BukkitAdapter.adapt(ent.getLocation()),
-                        WorldGuardPlugin.inst().wrapPlayer(player),
-                        Flags.HEALTH_REGEN)) {
+                BukkitAdapter.adapt(ent.getLocation()),
+                WorldGuardPlugin.inst().wrapPlayer(player),
+                Flags.HEALTH_REGEN)) {
             event.setCancelled(true);
         }
     }
@@ -789,8 +827,8 @@ public class WorldGuardEntityListener extends AbstractListener {
     public void onFoodChange(FoodLevelChangeEvent event) {
         if (event.getItem() != null) return;
         HumanEntity ent = event.getEntity();
-        if (Entities.isNPC(ent)) return;
         if (!(ent instanceof Player bukkitPlayer)) return;
+        if (Entities.isNPC(bukkitPlayer)) return;
         if (event.getFoodLevel() > ent.getFoodLevel()) return;
 
         LocalPlayer player = WorldGuardPlugin.inst().wrapPlayer(bukkitPlayer);
@@ -798,7 +836,7 @@ public class WorldGuardEntityListener extends AbstractListener {
 
         if (wcfg.useRegions
                 && !WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().testState(
-                        player.getLocation(), player, Flags.HUNGER_DRAIN)) {
+                player.getLocation(), player, Flags.HUNGER_DRAIN)) {
             event.setCancelled(true);
         }
     }
@@ -823,10 +861,12 @@ public class WorldGuardEntityListener extends AbstractListener {
 
             if ((id == Material.SAND || id == Material.RED_SAND) && wcfg.noPhysicsSand) {
                 event.setCancelled(true);
+                return;
             }
         } else if (ent instanceof Enderman) {
             if (wcfg.disableEndermanGriefing) {
                 event.setCancelled(true);
+                return;
             }
         } else if (ent.getType() == EntityType.WITHER) {
             if (wcfg.blockWitherBlockDamage || wcfg.blockWitherExplosions) {
@@ -837,11 +877,13 @@ public class WorldGuardEntityListener extends AbstractListener {
                 Location location = event.getBlock().getLocation();
                 if (!StateFlag.test(WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().queryState(BukkitAdapter.adapt(location), (RegionAssociable) null, Flags.WITHER_DAMAGE))) {
                     event.setCancelled(true);
+                    return;
                 }
             }
-        } else if (event instanceof EntityBreakDoorEvent) {
+        } else if (/*ent instanceof Zombie && */event instanceof EntityBreakDoorEvent) {
             if (wcfg.blockZombieDoorDestruction) {
                 event.setCancelled(true);
+                return;
             }
         }
     }
@@ -873,7 +915,73 @@ public class WorldGuardEntityListener extends AbstractListener {
                 }
             }
         }
-        return wcfg.blockEntityItemFrameDestroy && !(attacker instanceof Player);
+        if (wcfg.blockEntityItemFrameDestroy && !(attacker instanceof Player)) {
+            return true;
+        }
+        return false;
+    }
+
+    private static class PaperListener implements Listener {
+        @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+        public void onEntityZap(EntityZapEvent event) {
+            if (event.getEntityType() == EntityType.PIG) {
+                handlePigZap(event.getEntity(), event);
+            }
+        }
+
+        /**
+         * Applies the natural spawn checks from {@link WorldGuardEntityListener#onCreatureSpawn} before the
+         * server constructs the entity. The CreatureSpawnEvent checks fire at the very
+         * end of the spawn pipeline, after the position was picked, the placement
+         * checks ran and the mob was constructed and finalized, so a region that denies
+         * mob spawning pays for a mob to be built and thrown away on every attempt.
+         * Cancelling here skips the placement checks, the construction and
+         * finalizeSpawn for a spawn that was going to be refused anyway.
+         *
+         * Cancelling does not end the chunk's remaining attempts. Only
+         * setShouldAbortSpawn(true) makes the spawner return early; a plain cancel
+         * falls through to the next candidate position exactly like a failed
+         * placement check.
+         *
+         * Note that Paper fires this event for every candidate position, before the
+         * light, block and collision checks, so the region query below runs
+         * considerably more often than the CreatureSpawnEvent one did. On Paper with
+         * per-player-mob-spawns enabled, which is the default, every cancelled pre
+         * spawn is also charged to a per player mob backoff counter that is added to
+         * the mob cap of every player within tick view distance and bleeds off one per
+         * spawn cycle, so a large denied region can suppress spawning in neighbouring
+         * chunks that allow mobs.
+         *
+         * Only NATURAL spawns are handled here; every other spawn reason keeps going
+         * through the CreatureSpawnEvent checks unchanged.
+         */
+        @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+        public void onPreCreatureSpawn(PreCreatureSpawnEvent event) {
+            if (event.getReason() != SpawnReason.NATURAL) {
+                return;
+            }
+
+            ConfigurationManager cfg = getConfig();
+
+            if (!cfg.useRegionsPreCreatureSpawnEvent) {
+                return;
+            }
+
+            if (cfg.activityHaltToggle) {
+                event.setCancelled(true);
+                return;
+            }
+
+            Location spawnLoc = event.getSpawnLocation();
+            handleCreatureSpawn(event, spawnLoc, event.getType(), event.getReason(), cfg, getWorldConfig(spawnLoc.getWorld()));
+        }
+    }
+
+    private static class SpigotListener implements Listener {
+        @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+        public void onPigZap(PigZapEvent event) {
+            handlePigZap(event.getEntity(), event);
+        }
     }
 
 }
